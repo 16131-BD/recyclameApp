@@ -6,7 +6,7 @@ CREATE TABLE public.types (
   name character varying DEFAULT '500'::character varying,
   description text,
   additional_fields jsonb,
-  order bigint,
+  order_col bigint,
   CONSTRAINT types_pkey PRIMARY KEY (id)
 );
 
