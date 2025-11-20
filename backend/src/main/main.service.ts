@@ -1,16 +1,16 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { getDataSource } from './utils/data-source.util';
-import { 
-  ListEntityPostgres, 
-  NewEntityPostgres, 
-  AlterEntityPostgres,
-  ListEntityMongo,
-  NewEntityMongo,
-  AlterEntityMongo
-} from './utils/database.util';
+import { DatabaseUtil } from './utils/database.util';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class MainService {
+  constructor(
+    private readonly DatabaseUtil: DatabaseUtil,
+    private jwtService: JwtService
+  ) {
+
+  }
   async getEntitiesBy(entity: string, body: any, method: string) {
     try {
       const dataSource = getDataSource(method, `${entity}/by`);
@@ -22,10 +22,10 @@ export class MainService {
       let entities;
       
       if (dataSource.type === 'postgres') {
-        entities = await ListEntityPostgres(dataSource.identifier, body.filter || {});
+        entities = await this.DatabaseUtil.ListEntityPostgres(dataSource.identifier, body.filter || {});
       } else if (dataSource.type === 'mongo') {
         const { filter = {}, options = {} } = body;
-        entities = await ListEntityMongo(dataSource.identifier, filter, options);
+        entities = await this.DatabaseUtil.ListEntityMongo(dataSource.identifier, filter, options);
       }
 
       if (entities && entities.error) {
@@ -56,9 +56,9 @@ export class MainService {
       let entities;
       
       if (dataSource.type === 'postgres') {
-        entities = await NewEntityPostgres(dataSource.identifier, data);
+        entities = await this.DatabaseUtil.NewEntityPostgres(dataSource.identifier, data);
       } else if (dataSource.type === 'mongo') {
-        entities = await NewEntityMongo(dataSource.identifier, data);
+        entities = await this.DatabaseUtil.NewEntityMongo(dataSource.identifier, data);
       }
 
       if (entities && entities.error) {
@@ -89,9 +89,9 @@ export class MainService {
       let entities;
       
       if (dataSource.type === 'postgres') {
-        entities = await AlterEntityPostgres(dataSource.identifier, data);
+        entities = await this.DatabaseUtil.AlterEntityPostgres(dataSource.identifier, data);
       } else if (dataSource.type === 'mongo') {
-        entities = await AlterEntityMongo(dataSource.identifier, data);
+        entities = await this.DatabaseUtil.AlterEntityMongo(dataSource.identifier, data);
       }
 
       if (entities && entities.error) {
@@ -126,12 +126,12 @@ export class MainService {
 
   async login(filter: any) {
     try {
-      const result = await ListEntityPostgres('fx_sel_people', filter || {});
+      const result = await this.DatabaseUtil.ListEntityPostgres('fx_sel_users', filter || {});
       
       if (result.length) {
         const user = result[0];
         // Aquí deberías implementar tu lógica de token
-        const token = this.generateToken(user);
+        const token = await this.generateToken(user);
         user.token = token;
         return { success: true, data: user };
       } else {
@@ -145,9 +145,9 @@ export class MainService {
     }
   }
 
-  private generateToken(user: any): string {
+  private async generateToken(user: any) {
     // Implementa tu lógica de generación de token aquí
     // Esto es un ejemplo básico
-    return `token-${user.id}-${Date.now()}`;
+    return await this.jwtService.signAsync(user);
   }
 }

@@ -199,8 +199,7 @@ CREATE FUNCTION public.fx_sel_companies(JSONB)
         email       TEXT,
         phone       TEXT,
         code        VARCHAR,
-        company_type BIGINT,
-        updated_at  TIMESTAMP WITH TIME ZONE
+        company_type BIGINT
     )
 AS $BODY$
 DECLARE
@@ -230,8 +229,7 @@ BEGIN
         c.email,
         c.phone,
         c.code,
-        c.company_type,
-        c.updated_at
+        c.company_type
     FROM companies c
     LEFT JOIN filtros f ON TRUE
     WHERE
@@ -268,9 +266,7 @@ BEGIN
         x.phone,
         x.code,
         x.company_type,
-        x.created_at,
-        x.created_by,
-        x.updated_at
+        x.created_at
     FROM JSONB_TO_RECORDSET(p_json_data) AS x(
         name         TEXT,
         address      TEXT,
@@ -278,9 +274,7 @@ BEGIN
         phone        TEXT,
         code         VARCHAR(25),
         company_type BIGINT,
-        created_at   TIMESTAMP WITH TIME ZONE,
-        created_by   BIGINT,
-        updated_at   TIMESTAMP WITH TIME ZONE
+        created_at   TIMESTAMP WITH TIME ZONE
     );
 
     RETURN QUERY
@@ -291,9 +285,7 @@ BEGIN
         phone,
         code,
         company_type,
-        created_at,
-        created_by,
-        updated_at
+        created_at
     )
     SELECT
         INITCAP(TRIM(name)),
@@ -302,9 +294,7 @@ BEGIN
         TRIM(phone),
         UPPER(TRIM(code)),
         company_type,
-        COALESCE(created_at, CURRENT_TIMESTAMP),
-        created_by,
-        updated_at
+        COALESCE(created_at, CURRENT_TIMESTAMP)
     FROM tmp_companies
     RETURNING id, code;
 END;
@@ -383,8 +373,7 @@ CREATE FUNCTION public.fx_sel_users(JSONB)
         phone       TEXT,
         created_at  TIMESTAMP WITH TIME ZONE,
         company_id  BIGINT,
-        user_type   BIGINT,
-        updated_at  TIMESTAMP WITH TIME ZONE
+        user_type   BIGINT
     )
 AS $BODY$
 DECLARE
@@ -419,8 +408,7 @@ BEGIN
         u.phone,
         u.created_at,
         u.company_id,
-        u.user_type,
-        u.updated_at
+        u.user_type
     FROM users u
     LEFT JOIN filtros f ON TRUE
     WHERE
@@ -461,10 +449,8 @@ BEGIN
         x.email,
         x.phone,
         x.created_at,
-        x.created_by,
         x.company_id,
-        x.user_type,
-        x.updated_at
+        x.user_type
     FROM JSONB_TO_RECORDSET(p_json_data) AS x(
         code       VARCHAR(8),
         password   TEXT,
@@ -475,10 +461,8 @@ BEGIN
         email      TEXT,
         phone      TEXT,
         created_at TIMESTAMP WITH TIME ZONE,
-        created_by BIGINT,
         company_id BIGINT,
-        user_type  BIGINT,
-        updated_at TIMESTAMP WITH TIME ZONE
+        user_type  BIGINT
     );
 
     RETURN QUERY
@@ -493,9 +477,7 @@ BEGIN
         phone,
         created_at,
         company_id,
-        user_type,
-        created_by,
-        updated_at
+        user_type
     )
     SELECT
         COALESCE(UPPER(TRIM(code)), gen_random_uuid()::text), -- fallback simple unique
@@ -509,7 +491,6 @@ BEGIN
         COALESCE(created_at, CURRENT_TIMESTAMP),
         company_id,
         user_type,
-        created_by,
         updated_at
     FROM tmp_users
     RETURNING id, code;

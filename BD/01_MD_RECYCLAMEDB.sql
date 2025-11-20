@@ -1,3 +1,10 @@
+DROP TABLE IF EXISTS operations_detail;
+DROP TABLE IF EXISTS residues;
+DROP TABLE IF EXISTS plants;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS companies;
+DROP TABLE IF EXISTS types;
+
 CREATE TABLE public.types (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
@@ -90,6 +97,4 @@ CREATE TABLE public.operations_detail (
   CONSTRAINT operations_detail_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id),
   CONSTRAINT operations_detail_plant_id_fkey FOREIGN KEY (plant_id) REFERENCES public.plants(id)
 );
-
-
 

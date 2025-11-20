@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { Model } from 'mongoose';
+import { PrismaService } from 'src/database/prisma.service';
 
 // Interfaces
 export interface FilterOptions {
@@ -27,20 +27,18 @@ export interface DatabaseResult {
 @Injectable()
 export class DatabaseUtil {
   constructor(
-    private prisma: PrismaClient,
     // Inyectar modelos de MongoDB si es necesario
     @Inject('AFFILIATION_MODEL') private Affiliation: Model<any>,
     @Inject('MOBILE_DEVICE_MODEL') private MobileDevice: Model<any>,
     @Inject('REQUEST_MODEL') private Request: Model<any>,
-    // ... otros modelos
+    
+    private Prisma: PrismaService
   ) {}
-
-  // ===== MÉTODOS POSTGRES ===== //
 
   async ListEntityPostgres(fnName: string, filter: any): Promise<any> {
     try {
       console.log(`SELECT * FROM public.${fnName}('${JSON.stringify(filter)}'::jsonb)`);
-      const result = await this.prisma.$queryRawUnsafe(`SELECT * FROM public.${fnName}('${JSON.stringify(filter)}'::jsonb)`);
+      const result = await this.Prisma.$queryRawUnsafe(`SELECT * FROM public.${fnName}('${JSON.stringify(filter)}'::jsonb)`);
       return result;
     } catch (error) {
       throw new HttpException(`Hubo un error: ${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -49,7 +47,7 @@ export class DatabaseUtil {
 
   async NewEntityPostgres(fnName: string, data: any): Promise<any> {
     try {
-      const result = await this.prisma.$queryRawUnsafe(`SELECT * FROM public.${fnName}('${JSON.stringify(data)}'::jsonb)`);
+      const result = await this.Prisma.$queryRawUnsafe(`SELECT * FROM public.${fnName}('${JSON.stringify(data)}'::jsonb)`);
       if (result[0] && Object.values(result[0])[0]) {
         return result;
       } else {
@@ -62,7 +60,7 @@ export class DatabaseUtil {
 
   async AlterEntityPostgres(fnName: string, data: any): Promise<any> {
     try {
-      const result = await this.prisma.$queryRawUnsafe(`SELECT * FROM public.${fnName}('${JSON.stringify(data)}'::jsonb)`);
+      const result = await this.Prisma.$queryRawUnsafe(`SELECT * FROM public.${fnName}('${JSON.stringify(data)}'::jsonb)`);
       if (result[0] && Object.values(result[0])[0]) {
         return { message: "Proceso realizado correctamente" };
       } else {
@@ -72,8 +70,6 @@ export class DatabaseUtil {
       throw new HttpException(`Hubo un error: ${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
-  // ===== MÉTODOS MONGO ===== //
 
   async ListEntityMongo(modelName: string, filter: any, options: FilterOptions = {}): Promise<any> {
     try {
@@ -242,29 +238,3 @@ export class DatabaseUtil {
     return model;
   }
 }
-
-// Exportar funciones individuales (para compatibilidad con el código existente)
-export const ListEntityPostgres = async (fnName: string, filter: any): Promise<any> => {
-  // Necesitarás inyectar PrismaService o crear una instancia
-  throw new Error('Esta función requiere PrismaService inyectado');
-};
-
-export const NewEntityPostgres = async (fnName: string, data: any): Promise<any> => {
-  throw new Error('Esta función requiere PrismaService inyectado');
-};
-
-export const AlterEntityPostgres = async (fnName: string, data: any): Promise<any> => {
-  throw new Error('Esta función requiere PrismaService inyectado');
-};
-
-export const ListEntityMongo = async (modelName: string, filter: any, options: FilterOptions = {}): Promise<any> => {
-  throw new Error('Esta función requiere modelos de MongoDB inyectados');
-};
-
-export const NewEntityMongo = async (modelName: string, data: any): Promise<any> => {
-  throw new Error('Esta función requiere modelos de MongoDB inyectados');
-};
-
-export const AlterEntityMongo = async (modelName: string, data: any): Promise<any> => {
-  throw new Error('Esta función requiere modelos de MongoDB inyectados');
-};
