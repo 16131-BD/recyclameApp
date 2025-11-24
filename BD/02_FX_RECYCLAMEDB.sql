@@ -767,6 +767,9 @@ CREATE FUNCTION public.fx_sel_residues(JSONB)
         company_id  BIGINT,
         name        VARCHAR,
         residue_type BIGINT,
+        status_type BIGINT,
+        unit_measurement BIGINT,
+        waste_generation_date DATE,
         quantity    NUMERIC,
         status      BIGINT,
         plant_id    BIGINT,
@@ -783,6 +786,7 @@ BEGIN
             x.id,
             x.company_id,
             x.residue_type,
+            x.status_type,
             x.plant_id,
             x.status,
             x.created_at
@@ -790,6 +794,8 @@ BEGIN
             id           BIGINT,
             company_id   BIGINT,
             residue_type BIGINT,
+            status_type  BIGINT,
+            unit_measurement BIGINT,
             plant_id     BIGINT,
             status       BIGINT,
             created_at   TIMESTAMP WITH TIME ZONE
@@ -801,6 +807,9 @@ BEGIN
         r.company_id,
         r.name,
         r.residue_type,
+        r.status_type,
+        r.unit_measurement,
+        r.waste_generation_date,
         r.quantity,
         r.status,
         r.plant_id,
@@ -812,6 +821,8 @@ BEGIN
         (f.id IS NULL OR r.id = f.id)
         AND (f.company_id IS NULL OR r.company_id = f.company_id)
         AND (f.residue_type IS NULL OR r.residue_type = f.residue_type)
+        AND (f.status_type IS NULL OR r.status_type = f.status_type)
+        AND (f.unit_measurement IS NULL OR r.unit_measurement = f.unit_measurement)
         AND (f.plant_id IS NULL OR r.plant_id = f.plant_id)
         AND (f.status IS NULL OR r.status = f.status)
         AND (f.created_at IS NULL OR DATE(r.created_at) = DATE(f.created_at));
@@ -837,6 +848,9 @@ BEGIN
         x.company_id,
         x.name,
         x.residue_type,
+        x.status_type,
+        x.unit_measurement,
+        x.waste_generation_date,
         x.quantity,
         x.status,
         x.plant_id,
@@ -848,6 +862,9 @@ BEGIN
         company_id   BIGINT,
         name         VARCHAR(500),
         residue_type BIGINT,
+        status_type  BIGINT,
+        unit_measurement BIGINT,
+        waste_generation_date DATE,
         quantity     NUMERIC,
         status       BIGINT,
         plant_id     BIGINT,
@@ -861,6 +878,9 @@ BEGIN
         company_id,
         name,
         residue_type,
+        status_type,
+        unit_measurement,
+        waste_generation_date,
         quantity,
         status,
         plant_id,
@@ -873,6 +893,9 @@ BEGIN
         company_id,
         INITCAP(TRIM(name)),
         residue_type,
+        status_type,
+        unit_measurement,
+        waste_generation_date,
         quantity,
         COALESCE(status, (SELECT id FROM types WHERE category IS NOT NULL LIMIT 1)), -- fallback
         plant_id,
@@ -906,6 +929,9 @@ BEGIN
         x.company_id,
         x.name,
         x.residue_type,
+        x.status_type,
+        x.unit_measurement,
+        x.waste_generation_date,
         x.quantity,
         x.status,
         x.plant_id,
@@ -916,6 +942,9 @@ BEGIN
         company_id   BIGINT,
         name         VARCHAR(500),
         residue_type BIGINT,
+        status_type  BIGINT,
+        unit_measurement BIGINT,
+        waste_generation_date DATE,
         quantity     NUMERIC,
         status       BIGINT,
         plant_id     BIGINT,
@@ -928,6 +957,9 @@ BEGIN
         company_id = COALESCE(u.company_id, r.company_id),
         name = COALESCE(INITCAP(TRIM(u.name)), r.name),
         residue_type = COALESCE(u.residue_type, r.residue_type),
+        status_type = COALESCE(u.status_type, r.status_type),
+        unit_measurement = COALESCE(u.unit_measurement, r.unit_measurement),
+        waste_generation_date = COALESCE(u.waste_generation_date, r.waste_generation_date),
         quantity = COALESCE(u.quantity, r.quantity),
         status = COALESCE(u.status, r.status),
         plant_id = COALESCE(u.plant_id, r.plant_id),
