@@ -1,0 +1,43 @@
+<div id="tablesView">
+  <div class="content-card">
+    <h5 class="mb-4">Administración de Tablas</h5>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label class="form-label">Seleccionar Tabla</label>
+        <select class="form-select" id="tableSelect">
+          <option value="">-- Seleccione una tabla --</option>
+          <option value="operations">Operations Detail</option>
+          <option value="residues">Residues</option>
+          <option value="plants">Plants</option>
+          <option value="users">Users</option>
+          <option value="companies">Companies</option>
+          <option value="types">Types</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="tableContent">
+      <div class="table-actions">
+        <button class="btn btn-primary btn-action">
+          <i class="fas fa-plus me-2"></i>Nuevo Registro
+        </button>
+        <button class="btn btn-success btn-action">
+          <i class="fas fa-download me-2"></i>Exportar
+        </button>
+        <button class="btn btn-secondary btn-action">
+          <i class="fas fa-sync me-2"></i>Actualizar
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover" id="dataTable">
+          <thead>
+            <tr id="tableHeaders"></tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
