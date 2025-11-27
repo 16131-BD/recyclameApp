@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
 import { Login } from './login/login';
-import { Dashboard } from './dashboard/dashboard';
-import { TableManagement } from './table-management/table-management';
 
 export const routes: Routes = [
   {
@@ -12,15 +10,11 @@ export const routes: Routes = [
   {
     path: 'inicio-de-sesion',
     component: Login
+  },
+  {
+    path: 'backoffice',
+    loadChildren: () => import("./backoffice/backoffice.module").then(m => m.BackofficeModule)
   }, 
-  {
-    path: 'inicio/tablero',
-    component: Dashboard
-  },
-  {
-    path: 'inicio/administracion-de-tablas',
-    component: TableManagement
-  },
   {
     path: '**',
     redirectTo: 'inicio-de-sesion'

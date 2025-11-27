@@ -30,7 +30,7 @@ export class Login implements OnInit {
     console.log(this.credentials);
     console.log("Debo enviar las credenciales (username y password) al backend");
     console.log("Validara ingreso");
-    this.Router.navigate(['inicio/tablero']);
+    this.Router.navigate(['backoffice/tablero']);
   }
 
 }

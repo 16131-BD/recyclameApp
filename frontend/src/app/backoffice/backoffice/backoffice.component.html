@@ -1,0 +1,42 @@
+<div id="dashboardPage" class="dashboard-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-cogs fa-2x mb-2"></i>
+      <h4>Admin Panel</h4>
+    </div>
+    <nav class="nav flex-column">
+      <a class="nav-link active" [routerLink]="['/backoffice/tablero']" data-page="dashboard">
+        <i class="fas fa-chart-line"></i>Dashboard
+      </a>
+      <a class="nav-link" [routerLink]="['/backoffice/administracion-de-tablas']" data-page="tables">
+        <i class="fas fa-database"></i>Tablas
+      </a>
+    </nav>
+    <div class="position-absolute bottom-0 w-100 p-3">
+      <button class="btn btn-danger w-100" id="logoutBtn">
+        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div>
+        <h4 class="mb-0">Bienvenido, Administrador</h4>
+        <small class="text-muted">Gestiona tu sistema desde aquí</small>
+      </div>
+      <div>
+        <span class="badge bg-success">En línea</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <router-outlet />
+      </div>
+    </div>
+  </div>
+</div>
