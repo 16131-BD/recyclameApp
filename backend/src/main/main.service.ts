@@ -126,16 +126,16 @@ export class MainService {
 
   async login(filter: any) {
     try {
-      const result = await this.DatabaseUtil.ListEntityPostgres('fx_sel_users', filter || {});
-      
-      if (result.length) {
+      const result = await this.DatabaseUtil.ListEntityPostgres('fx_sel_users_with_credentials', filter || []);
+      console.log(filter);
+      if (filter.length && result.length) {
         const user = result[0];
         // Aquí deberías implementar tu lógica de token
         const token = await this.generateToken(user);
         user.token = token;
         return { success: true, data: user };
       } else {
-        return { success: true, data: result };
+        return { success: true, data: null };
       }
     } catch (error) {
       throw new HttpException(

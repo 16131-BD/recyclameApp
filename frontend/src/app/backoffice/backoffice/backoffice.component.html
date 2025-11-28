@@ -6,15 +6,18 @@
       <h4>Admin Panel</h4>
     </div>
     <nav class="nav flex-column">
-      <a class="nav-link active" [routerLink]="['/backoffice/tablero']" data-page="dashboard">
+      <a class="nav-link" (click)="selectMenuItem(m)" [ngClass]="{'active': m.selected}" *ngFor="let m of menu" [routerLink]="[m.uri]" data-page="dashboard">
+        <i class="{{m.icon}}"></i>{{m.name}}
+      </a>
+      <!-- <a class="nav-link" [routerLink]="['/backoffice/tablero']" data-page="dashboard">
         <i class="fas fa-chart-line"></i>Dashboard
       </a>
       <a class="nav-link" [routerLink]="['/backoffice/administracion-de-tablas']" data-page="tables">
         <i class="fas fa-database"></i>Tablas
-      </a>
+      </a> -->
     </nav>
     <div class="position-absolute bottom-0 w-100 p-3">
-      <button class="btn btn-danger w-100" id="logoutBtn">
+      <button class="btn btn-danger w-100" id="logoutBtn" (click)="logout()">
         <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
       </button>
     </div>

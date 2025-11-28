@@ -427,6 +427,60 @@ COMMENT ON FUNCTION public.fx_sel_users(JSONB) IS '
 OBJETIVO: Consultar registros en users con filtros opcionales JSONB.
 ';
 
+DROP FUNCTION IF EXISTS public.fx_sel_users_with_credentials(JSONB);
+CREATE FUNCTION public.fx_sel_users_with_credentials(JSONB)
+    RETURNS TABLE (
+        id          BIGINT,
+        code        VARCHAR,
+        names       TEXT,
+        last_names  TEXT,
+        birth_date  DATE,
+        gender      BOOLEAN,
+        email       TEXT,
+        phone       TEXT,
+        created_at  TIMESTAMP WITH TIME ZONE,
+        company_id  BIGINT,
+        user_type   BIGINT
+    )
+AS $BODY$
+DECLARE
+    p_json_data ALIAS FOR $1;
+BEGIN
+    RETURN QUERY
+    WITH filtros AS (
+        SELECT
+            x.code,
+            x.password
+        FROM JSONB_TO_RECORDSET(COALESCE(p_json_data,'[]'::JSONB)) AS x(
+            code       VARCHAR(8),
+            password   TEXT
+        )
+    )
+    SELECT
+        u.id,
+        u.code,
+        u.names,
+        u.last_names,
+        u.birth_date,
+        u.gender,
+        u.email,
+        u.phone,
+        u.created_at,
+        u.company_id,
+        u.user_type
+    FROM users u
+    LEFT JOIN filtros f ON TRUE
+    WHERE u.code = f.code
+        AND u.password = f.password;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE SECURITY DEFINER
+COST 1000;
+
+COMMENT ON FUNCTION public.fx_sel_users_with_credentials(JSONB) IS '
+OBJETIVO: Consultar registros en users con filtros opcionales JSONB.
+';
+
 DROP FUNCTION IF EXISTS public.fx_ins_users(JSONB);
 CREATE FUNCTION public.fx_ins_users(JSONB)
     RETURNS TABLE (
