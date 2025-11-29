@@ -12,8 +12,16 @@ export class MainService {
     private Http: HttpClient
   ) { }
 
+  getToken() {
+    return JSON.parse(sessionStorage.getItem('userLoged') || '{}').token;
+  }
+
   login(body: any) {
     return this.Http.post(`${this.uri}/login`, body);
+  }
+
+  getEntity(entity: string, body: any) {
+    return this.Http.post(`${this.uri}/${entity}/by`, body);
   }
 
 }
