@@ -31,10 +31,10 @@ VALUES
 
 ('company_type', 'MUN', 'Municipalidad / Autoridad Local', 
  'Entidad que regula, fiscaliza y gestiona la recolección y operación.',
- '{"role": "fiscalizador"}', 8)
+ '{"role": "fiscalizador"}', 8),
 ('user_type', 'ADM', 'Administrador', 'Usuario con privilegios administrativos', null, 1),
 ('user_type', 'OPE', 'Operador', 'Usuario encargado de la gestión operativa', null, 2),
-('user_type', 'SUP', 'Supervisor', 'Encargado de supervisar procesos', null, 3)
+('user_type', 'SUP', 'Supervisor', 'Encargado de supervisar procesos', null, 3),
 ('residue_type', 'PLA', 'Plástico', 'Residuos de tipo plástico', NULL ,1),
 ('residue_type', 'PAP', 'Papel', 'Residuos de tipo papel', NULL ,2),
 ('residue_type', 'MET', 'Metal', 'Residuos metálicos', NULL ,3),
@@ -53,7 +53,7 @@ VALUES
 ('residue_status_type', 'L', 'Liquido', 'Estado del Residuo - Liquido', NULL ,3),
 ('residue_status_type', 'G', 'Gaseoso', 'Estado del Residuo - Gaseoso', NULL ,4)
 ;
-;
+
 
 -- Tabla: companies
 INSERT INTO public.companies (name, address, email, phone, code, company_type)
