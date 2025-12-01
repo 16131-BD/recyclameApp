@@ -6,63 +6,64 @@
       <div class="col-6">
         <div class="input-group input-group-sm">
           <span class="input-group-text" id="basic-addon1">Tabla</span>
-          <select name="tableToSelect" [(ngModel)]="filters.model" class="form-select" id="tableSelect">
+          <select name="tableToSelect" (change)="getEntities()" [(ngModel)]="filters.model" class="form-select" id="tableSelect">
             <option [ngValue]="undefined">-- Seleccione una tabla --</option>
             <option [ngValue]="t.id" *ngFor="let t of tables">{{t.name | uppercase}}</option>
           </select>
         </div>
       </div>
-      <div class="col-6 text-end" *ngIf="tableSelected.searched">
-        <div class="table-actions">
-          <button class="btn btn-sm btn-light text-primary" *ngIf="tableSelected.results.length" (click)="toggleFilters()">
-            <i class="fas fa-cog"></i>
-          </button>
-          <button class="btn btn-sm btn-primary">
-            <i class="fas fa-plus me-2"></i>Nuevo Registro
-          </button>
-          <button class="btn btn-sm btn-success">
-            <i class="fas fa-download me-2"></i>Exportar
-          </button>
-          <button class="btn btn-sm btn-secondary">
-            <i class="fas fa-sync me-2"></i>Actualizar
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div id="tableContent">
-      {{tableSelected.results.length}}
-      {{tableSelected.searched == true}}
-      @if(tableSelected.results) {
-        <div class="row" style="max-height: 300px !important; overflow: auto;">
-          @if(!tableSelected.results.length && tableSelected.searched) {
-            <div class="col-12 text-center">
-              <i class="fas fa-times fa-2x"></i><br>
-              No existen registros
-            </div>
-          }
-          @if(tableSelected.results.length) {
-            <div class="col-3" *ngFor="let d of tableSelected.results">
-              <div class="card mb-2">
-                <div class="card-body p-1" style="height: 80px !important;">
-                  <small>
-                    <span class="badge bg-success me-2">{{d.id}}</span>
-                    {{d.name | uppercase}}
-                  </small>
-                </div>
-                <div class="card-footer p-1">
-                  <button class="btn btn-sm btn-light text-primary me-2">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn btn-sm btn-light text-danger">
-                    <i class="fas fa-minus"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          }
+      @if(filters.model) {
+        <div class="col-6 text-end">
+          <div class="table-actions">
+            <button class="btn btn-sm btn-light text-primary" *ngIf="tableSelected.results.length" (click)="toggleFilters()">
+              <i class="fas fa-cog"></i>
+            </button>
+            <button class="btn btn-sm btn-primary">
+              <i class="fas fa-plus me-2"></i>Nuevo Registro
+            </button>
+            <button class="btn btn-sm btn-success">
+              <i class="fas fa-download me-2"></i>Exportar
+            </button>
+            <button class="btn btn-sm btn-secondary">
+              <i class="fas fa-sync me-2"></i>Actualizar
+            </button>
+          </div>
         </div>
       }
     </div>
+    @if(filters.model) {
+      <div id="tableContent">
+        @if(tableSelected.results) {
+          <div class="row" style="max-height: 300px !important; overflow: auto;">
+            @if(!tableSelected.results.length && tableSelected.searched) {
+              <div class="col-12 text-center">
+                <i class="fas fa-times fa-2x"></i><br>
+                No existen registros
+              </div>
+            }
+            @if(tableSelected.results.length) {
+              <div class="col-3" *ngFor="let d of tableSelected.results">
+                <div class="card mb-2">
+                  <div class="card-body p-1" style="height: 80px !important;">
+                    <small>
+                      <span class="badge bg-success me-2">{{d.id}}</span>
+                      {{d.name | uppercase}}
+                    </small>
+                  </div>
+                  <div class="card-footer p-1">
+                    <button class="btn btn-sm btn-light text-primary me-2">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-light text-danger">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
   </div>
 </div>

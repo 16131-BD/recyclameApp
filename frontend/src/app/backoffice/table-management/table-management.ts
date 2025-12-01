@@ -42,12 +42,7 @@ export class TableManagement implements OnInit {
 
   tableSelected: any = {};
 
-  async ngOnInit() {
-    this.tableSelected = this.tables[0];
-    this.tableSelected.results = [];
-    this.tableSelected.searched = false;
-    this.getEntities();
-  }
+  async ngOnInit() {}
 
   // async selectTable() {
   //   this.getEntities();
@@ -58,6 +53,7 @@ export class TableManagement implements OnInit {
   }
 
   async getEntities() {
+    this.tableSelected = this.tables.find((t: any) => t.id === this.filters.model);
     let body: any = {filter: []};
     if (this.filters.text) {
       body.filter = [

@@ -81,7 +81,7 @@ CREATE TABLE public.residues (
   CONSTRAINT residues_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id),
   CONSTRAINT residues_status_fkey FOREIGN KEY (status) REFERENCES public.types(id),
   CONSTRAINT residues_plant_id_fkey FOREIGN KEY (plant_id) REFERENCES public.plants(id),
-  CONSTRAINT residues_user_operator_fkey FOREIGN KEY (user_operator) REFERENCES public.users(id)
+  CONSTRAINT residues_user_operator_fkey FOREIGN KEY (user_operator) REFERENCES public.users(id),
   CONSTRAINT residues_status_type_fkey FOREIGN KEY(status_type) REFERENCES public.types(id),
   CONSTRAINT residues_unit_measurement_fkey FOREIGN KEY(unit_measurement) REFERENCES public.types(id)
 );

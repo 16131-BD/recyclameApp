@@ -821,14 +821,16 @@ CREATE FUNCTION public.fx_sel_residues(JSONB)
         company_id  BIGINT,
         name        VARCHAR,
         residue_type BIGINT,
-        status_type BIGINT,
+        resudue_type_name VARCHAR,
+        status_type 		BIGINT,
+        status_type_name VARCHAR,
         unit_measurement BIGINT,
         waste_generation_date DATE,
         quantity    NUMERIC,
         status      BIGINT,
+        status_name VARCHAR,
         plant_id    BIGINT,
-        user_operator BIGINT,
-        updated_at  TIMESTAMP WITH TIME ZONE
+        user_operator BIGINT
     )
 AS $BODY$
 DECLARE
@@ -861,21 +863,32 @@ BEGIN
         r.company_id,
         r.name,
         r.residue_type,
+		rt.name::VARCHAR,
         r.status_type,
+		rs.name::VARCHAR,
         r.unit_measurement,
         r.waste_generation_date,
         r.quantity,
         r.status,
+		s.name::VARCHAR,
         r.plant_id,
-        r.user_operator,
-        r.updated_at
+        r.user_operator
     FROM residues r
+	INNER JOIN types as rs
+		ON r.status_type = rs.id
+		AND rs.category = 'residue_status_type'
+	INNER JOIN types as rt
+		ON r.residue_type = rt.id
+		AND rt.category = 'residue_type'
+	INNER JOIN types as s
+		ON r.status = s.id
+		AND s.category = 'main_status'
     LEFT JOIN filtros f ON TRUE
     WHERE
         (f.id IS NULL OR r.id = f.id)
         AND (f.company_id IS NULL OR r.company_id = f.company_id)
-        AND (f.residue_type IS NULL OR r.residue_type = f.residue_type)
-        AND (f.status_type IS NULL OR r.status_type = f.status_type)
+        AND (f.residue_type IS NULL OR rt.name ilike '%'||f.residue_type||'%')
+        AND (f.status_type IS NULL OR rs.name ilike '%'||f.status_type||'%')
         AND (f.unit_measurement IS NULL OR r.unit_measurement = f.unit_measurement)
         AND (f.plant_id IS NULL OR r.plant_id = f.plant_id)
         AND (f.status IS NULL OR r.status = f.status)
