@@ -1,1 +1,1 @@
-create database recyclameDB;
+create database recycledb;
