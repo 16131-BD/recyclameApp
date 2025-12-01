@@ -1,27 +1,171 @@
-<div id="loginPage" class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <i class="fas fa-lock"></i>
-      <h3 class="mb-0">Backoffice Admin</h3>
-      <p class="mb-0 mt-2">Panel de Administración</p>
+<div class="login-container">
+  <!-- Left Panel - Branding -->
+  <div class="login-branding">
+    <div class="branding-content">
+      <div class="brand-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/>
+          <path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/>
+          <path d="m14 16-3 3 3 3"/>
+          <path d="M8.293 13.596 4.875 7.33a1.783 1.783 0 0 1 .013-1.782A1.83 1.83 0 0 1 6.46 4.64l8.08.004"/>
+          <path d="m10 8 3-3-3-3"/>
+          <path d="M16.293 13.596 19.71 7.33a1.783 1.783 0 0 0-.014-1.782A1.83 1.83 0 0 0 18.124 4.64L14 4.635"/>
+        </svg>
+      </div>
+      <h1 class="brand-title">RecyclameApp</h1>
+      <p class="brand-subtitle">
+        Plataforma integral para la gestión sostenible de residuos empresariales en cumplimiento con las normativas ambientales.
+      </p>
+      <div class="brand-features">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>
+          </div>
+          <span class="feature-text">Gestión de empresas y plantas de tratamiento</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/><path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/><path d="m14 16-3 3 3 3"/></svg>
+          </div>
+          <span class="feature-text">Seguimiento completo del ciclo de residuos</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          </div>
+          <span class="feature-text">Reportes y estadísticas en tiempo real</span>
+        </div>
+      </div>
     </div>
-    <div class="login-body">
-      <form #loginForm="ngForm" id="loginForm">
-        <div class="mb-3">
-          <label class="form-label">Usuario</label>
-          <input type="text" class="form-control" name="username" [(ngModel)]="credentials.username" id="username" placeholder="admin" required>
+  </div>
+
+  <!-- Right Panel - Form -->
+  <div class="login-form-panel">
+    <div class="login-form-container">
+      <div class="login-header">
+        <div class="login-logo-mobile">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/>
+            <path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/>
+            <path d="m14 16-3 3 3 3"/>
+            <path d="M8.293 13.596 4.875 7.33a1.783 1.783 0 0 1 .013-1.782A1.83 1.83 0 0 1 6.46 4.64l8.08.004"/>
+            <path d="m10 8 3-3-3-3"/>
+          </svg>
         </div>
-        <div class="mb-4">
-          <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" name="password" [(ngModel)]="credentials.password" id="password" placeholder="••••••••" required>
+        <h1 class="login-title">Bienvenido</h1>
+        <p class="login-subtitle">Ingresa tus credenciales para acceder al sistema</p>
+      </div>
+
+      <div class="login-card">
+        @if (errorMessage) {
+          <div class="error-message">
+            <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="m15 9-6 6"/>
+              <path d="m9 9 6 6"/>
+            </svg>
+            <span class="error-text">{{ errorMessage }}</span>
+          </div>
+        }
+
+        <form (ngSubmit)="login()">
+          <div class="form-group">
+            <label class="form-label">Código de Usuario</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <input 
+                type="text" 
+                class="form-input" 
+                name="username" 
+                [(ngModel)]="credentials.username"
+                placeholder="Ej: U009"
+                autocomplete="username"
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Contraseña</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <input 
+                [type]="showPassword ? 'text' : 'password'" 
+                class="form-input" 
+                name="password" 
+                [(ngModel)]="credentials.password"
+                placeholder="••••••••"
+                autocomplete="current-password"
+              >
+              <button type="button" class="password-toggle" (click)="togglePassword()">
+                @if (showPassword) {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/>
+                    <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/>
+                    <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/>
+                    <path d="m2 2 20 20"/>
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+          </div>
+
+          <div class="form-options">
+            <label class="checkbox-label">
+              <input type="checkbox" class="checkbox-input" [(ngModel)]="rememberMe" name="remember">
+              <span class="checkbox-custom">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+              </span>
+              <span>Recordarme</span>
+            </label>
+            <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <button type="submit" class="login-button" [disabled]="isLoading">
+            @if (isLoading) {
+              <div class="spinner"></div>
+              <span>Iniciando sesión...</span>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                <polyline points="10 17 15 12 10 7"/>
+                <line x1="15" x2="3" y1="12" y2="12"/>
+              </svg>
+              <span>Iniciar Sesión</span>
+            }
+          </button>
+        </form>
+
+        <div class="demo-credentials">
+          <div class="demo-title">Credenciales de prueba</div>
+          <div class="demo-info">
+            <span class="demo-item">
+              <span class="demo-label">Usuario:</span>
+              <span class="demo-value">U009</span>
+            </span>
+            <span class="demo-item">
+              <span class="demo-label">Contraseña:</span>
+              <span class="demo-value">1234</span>
+            </span>
+          </div>
         </div>
-        <button type="submit" class="btn btn-primary btn-login w-100" [disabled]="loginForm.invalid" (click)="login()">
-          <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
-        </button>
-        <div class="text-center mt-3">
-          <small class="text-muted">Usuario: admin | Contraseña: admin123</small>
-        </div>
-      </form>
+      </div>
+
+      <div class="login-footer">
+        © 2024 RecyclameApp. Sistema de Gestión de Residuos.
+      </div>
     </div>
   </div>
 </div>

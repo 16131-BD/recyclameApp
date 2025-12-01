@@ -8,14 +8,14 @@
           <span class="input-group-text" id="basic-addon1">Tabla</span>
           <select name="tableToSelect" (change)="getEntities()" [(ngModel)]="filters.model" class="form-select" id="tableSelect">
             <option [ngValue]="undefined">-- Seleccione una tabla --</option>
-            <option [ngValue]="t.id" *ngFor="let t of tables">{{t.name | uppercase}}</option>
+            <option [ngValue]="t.id" *ngFor="let t of tables; trackBy: trackByTableId">{{t.name | uppercase}}</option>
           </select>
         </div>
       </div>
-      @if(filters.model) {
+      @if(filters.model && tableSelected) {
         <div class="col-6 text-end">
           <div class="table-actions">
-            <button class="btn btn-sm btn-light text-primary" *ngIf="tableSelected.results.length" (click)="toggleFilters()">
+            <button class="btn btn-sm btn-light text-primary" *ngIf="tableSelected.results && tableSelected.results.length" (click)="toggleFilters()">
               <i class="fas fa-cog"></i>
             </button>
             <button class="btn btn-sm btn-primary">
@@ -24,30 +24,30 @@
             <button class="btn btn-sm btn-success">
               <i class="fas fa-download me-2"></i>Exportar
             </button>
-            <button class="btn btn-sm btn-secondary">
+            <button class="btn btn-sm btn-secondary" (click)="getEntities()">
               <i class="fas fa-sync me-2"></i>Actualizar
             </button>
           </div>
         </div>
       }
     </div>
-    @if(filters.model) {
+    @if(filters.model && tableSelected) {
       <div id="tableContent">
         @if(tableSelected.results) {
           <div class="row" style="max-height: 300px !important; overflow: auto;">
-            @if(!tableSelected.results.length && tableSelected.searched) {
+            @if(tableSelected.results.length === 0 && tableSelected.searched) {
               <div class="col-12 text-center">
                 <i class="fas fa-times fa-2x"></i><br>
                 No existen registros
               </div>
             }
-            @if(tableSelected.results.length) {
-              <div class="col-3" *ngFor="let d of tableSelected.results">
+            @if(tableSelected.results.length > 0) {
+              <div class="col-3" *ngFor="let d of tableSelected.results; trackBy: trackById">
                 <div class="card mb-2">
                   <div class="card-body p-1" style="height: 80px !important;">
                     <small>
-                      <span class="badge bg-success me-2">{{d.id}}</span>
-                      {{d.name | uppercase}}
+                      <span class="badge bg-success me-2">{{d.id || d._id}}</span>
+                      {{(d.name || d.names || 'Sin nombre') | uppercase}}
                     </small>
                   </div>
                   <div class="card-footer p-1">

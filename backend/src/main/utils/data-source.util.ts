@@ -4,17 +4,14 @@ const functions = {
     'POST': {
       'companies/by': 'fx_sel_companies',
       'companies/create': 'fx_ins_companies',
-      'operations_details/by': 'fx_sel_operations_detail',
-      'operations_details/create': 'fx_ins_operations_detail',
+      'operations_detail/by': 'fx_sel_operations_detail',
+      'operations_detail/create': 'fx_ins_operations_detail',
       'plants/by': 'fx_sel_plants',
       'plants/create': 'fx_ins_plants',
-      'residues/by': 'fx_sel_residues',
-      'residues/create': 'fx_ins_residues',
       'types/by': 'fx_sel_types',
       'types/create': 'fx_ins_types',
       'users/by': 'fx_sel_users',
       'users/create': 'fx_ins_users',
-      // ... resto de tus mappings
     },
     'PUT': {
       'companies/update': 'fx_update_companies',
@@ -34,11 +31,17 @@ const functions = {
       'mobile_devices/create': 'mobile_devices',
       'requests/by': 'requests',
       'requests/create': 'requests',
+      'residues/by': 'residues',
+      'residues/create': 'residues',
+      'authorized_operations/by': 'authorized_operations',
+      'authorized_operations/create': 'authorized_operations',
     },
     'PUT': {
       'affiliations/update': 'affiliations',
       'mobile_devices/update': 'mobile_devices',
       'requests/update': 'requests',
+      'residues/update': 'residues',
+      'authorized_operations/update': 'authorized_operations',
     }
     // ... tu configuración de mongo
   }

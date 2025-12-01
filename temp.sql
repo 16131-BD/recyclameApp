@@ -1,0 +1,1 @@
+﻿SELECT * FROM public.fx_sel_plants('[]'::jsonb) LIMIT 1;

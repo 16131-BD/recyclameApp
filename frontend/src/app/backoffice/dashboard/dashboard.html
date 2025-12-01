@@ -1,119 +1,209 @@
 <!-- Dashboard View -->
-<div id="dashboardView">
-  <div class="row g-4">
-    <div class="col-md-4">
+<div class="dashboard-view">
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    @for (stat of stats; track stat.title) {
       <div class="stat-card">
-        <div class="d-flex align-items-center">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <i class="fas fa-clipboard-list"></i>
+        <div class="stat-icon" [class]="stat.color" [innerHTML]="getIconSvg(stat.icon)"></div>
+        <div class="stat-value">
+          @if (isLoading()) {
+            <div class="skeleton" style="width: 60px; height: 32px;"></div>
+          } @else {
+            {{ stat.value | number }}
+          }
+        </div>
+        <div class="stat-label">{{ stat.title }}</div>
+        @if (stat.change !== undefined && stat.change !== 0) {
+          <div class="stat-change" [class.positive]="stat.change > 0" [class.negative]="stat.change < 0">
+            @if (stat.change > 0) {
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m18 15-6-6-6 6"/>
+              </svg>
+              +{{ stat.change }}%
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+              {{ stat.change }}%
+            }
+            <span class="text-muted" style="margin-left: 4px;">{{ stat.changeLabel }}</span>
           </div>
-          <div class="ms-3">
-            <h6 class="text-muted mb-1">Operaciones</h6>
-            <h3 class="mb-0">156</h3>
-          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Main Content Grid -->
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    <!-- Recent Activity -->
+    <div class="card">
+      <div class="card-header">
+        <h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;">
+            <path d="M12 8v4l3 3"/>
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
+          Actividad Reciente
+        </h3>
+        <button class="btn btn-sm btn-secondary">Ver todo</button>
+      </div>
+      <div class="card-body" style="padding: 0;">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Acción</th>
+                <th>Entidad</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (isLoading()) {
+                @for (i of [1,2,3,4,5]; track i) {
+                  <tr>
+                    <td><div class="skeleton" style="width: 120px; height: 16px;"></div></td>
+                    <td><div class="skeleton" style="width: 180px; height: 16px;"></div></td>
+                    <td><div class="skeleton" style="width: 100px; height: 16px;"></div></td>
+                    <td><div class="skeleton" style="width: 60px; height: 24px;"></div></td>
+                  </tr>
+                }
+              } @else {
+                @for (activity of recentActivities; track activity.date) {
+                  <tr>
+                    <td style="color: var(--gray-500); font-size: 0.875rem;">{{ activity.date }}</td>
+                    <td>{{ activity.action }}</td>
+                    <td><strong>{{ activity.entity }}</strong></td>
+                    <td>
+                      <span class="badge" [ngClass]="{
+                        'badge-success': activity.status === 'success',
+                        'badge-warning': activity.status === 'warning',
+                        'badge-danger': activity.status === 'danger'
+                      }">
+                        @switch (activity.status) {
+                          @case ('success') { Exitoso }
+                          @case ('warning') { Pendiente }
+                          @case ('danger') { Error }
+                        }
+                      </span>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="4" style="text-align: center; padding: 40px; color: var(--gray-500);">
+                      No hay actividad reciente
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="stat-card">
-        <div class="d-flex align-items-center">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-            <i class="fas fa-recycle"></i>
-          </div>
-          <div class="ms-3">
-            <h6 class="text-muted mb-1">Residuos</h6>
-            <h3 class="mb-0">89</h3>
-          </div>
-        </div>
+
+    <!-- Residues by Type -->
+    <div class="card">
+      <div class="card-header">
+        <h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;">
+            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+            <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+          </svg>
+          Residuos por Tipo
+        </h3>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div class="stat-card">
-        <div class="d-flex align-items-center">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-            <i class="fas fa-industry"></i>
-          </div>
-          <div class="ms-3">
-            <h6 class="text-muted mb-1">Plantas</h6>
-            <h3 class="mb-0">12</h3>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="stat-card">
-        <div class="d-flex align-items-center">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-            <i class="fas fa-users"></i>
-          </div>
-          <div class="ms-3">
-            <h6 class="text-muted mb-1">Usuarios</h6>
-            <h3 class="mb-0">45</h3>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="stat-card">
-        <div class="d-flex align-items-center">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-            <i class="fas fa-building"></i>
-          </div>
-          <div class="ms-3">
-            <h6 class="text-muted mb-1">Empresas</h6>
-            <h3 class="mb-0">23</h3>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="stat-card">
-        <div class="d-flex align-items-center">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
-            <i class="fas fa-tags"></i>
-          </div>
-          <div class="ms-3">
-            <h6 class="text-muted mb-1">Tipos</h6>
-            <h3 class="mb-0">8</h3>
-          </div>
-        </div>
+      <div class="card-body">
+        @if (isLoading()) {
+          @for (i of [1,2,3,4]; track i) {
+            <div style="margin-bottom: 16px;">
+              <div class="skeleton" style="width: 100%; height: 32px; margin-bottom: 8px;"></div>
+            </div>
+          }
+        } @else {
+          @for (item of residuesByType; track item.type) {
+            <div style="margin-bottom: 20px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-weight: 500;">{{ item.type }}</span>
+                <span style="color: var(--gray-500);">{{ item.count }} ({{ item.percentage }}%)</span>
+              </div>
+              <div style="background: var(--gray-200); border-radius: var(--radius-full); height: 8px; overflow: hidden;">
+                <div 
+                  style="height: 100%; border-radius: var(--radius-full); transition: width 0.5s ease;"
+                  [style.width.%]="item.percentage"
+                  [style.background]="getTypeColor(item.type)"
+                ></div>
+              </div>
+            </div>
+          } @empty {
+            <div style="text-align: center; padding: 40px; color: var(--gray-500);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px; opacity: 0.5;">
+                <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/>
+                <path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/>
+              </svg>
+              <p>No hay datos de residuos</p>
+            </div>
+          }
+        }
       </div>
     </div>
   </div>
 
-  <div class="content-card">
-    <h5 class="mb-4">Actividad Reciente</h5>
-    <div class="table-responsive">
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Acción</th>
-            <th>Usuario</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>27/11/2025 10:30</td>
-            <td>Nueva operación registrada</td>
-            <td>Admin</td>
-            <td><span class="badge bg-success badge-custom">Exitoso</span></td>
-          </tr>
-          <tr>
-            <td>27/11/2025 09:15</td>
-            <td>Actualización de residuos</td>
-            <td>Admin</td>
-            <td><span class="badge bg-success badge-custom">Exitoso</span></td>
-          </tr>
-          <tr>
-            <td>26/11/2025 16:45</td>
-            <td>Nueva empresa agregada</td>
-            <td>Admin</td>
-            <td><span class="badge bg-success badge-custom">Exitoso</span></td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- Quick Actions -->
+  <div class="card" style="margin-top: 24px;">
+    <div class="card-header">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        Acciones Rápidas
+      </h3>
+    </div>
+    <div class="card-body">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <a routerLink="/backoffice/empresas" class="quick-action-card">
+          <div class="quick-action-icon green">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/>
+              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/>
+              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/>
+            </svg>
+          </div>
+          <span>Nueva Empresa</span>
+        </a>
+        
+        <a routerLink="/backoffice/residuos" class="quick-action-card">
+          <div class="quick-action-icon purple">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/>
+              <path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/>
+            </svg>
+          </div>
+          <span>Registrar Residuo</span>
+        </a>
+        
+        <a routerLink="/backoffice/usuarios" class="quick-action-card">
+          <div class="quick-action-icon blue">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <line x1="19" x2="19" y1="8" y2="14"/>
+              <line x1="22" x2="16" y1="11" y2="11"/>
+            </svg>
+          </div>
+          <span>Agregar Usuario</span>
+        </a>
+        
+        <a routerLink="/backoffice/operaciones" class="quick-action-card">
+          <div class="quick-action-icon orange">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
+            </svg>
+          </div>
+          <span>Nueva Operación</span>
+        </a>
+      </div>
     </div>
   </div>
 </div>

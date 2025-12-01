@@ -31,6 +31,8 @@ export class DatabaseUtil {
     @Inject('AFFILIATION_MODEL') private Affiliation: Model<any>,
     @Inject('MOBILE_DEVICE_MODEL') private MobileDevice: Model<any>,
     @Inject('REQUEST_MODEL') private Request: Model<any>,
+    @Inject('RESIDUE_MODEL') private Residue: Model<any>,
+    @Inject('AUTHORIZED_OPERATION_MODEL') private AuthorizedOperation: Model<any>,
     
     private Prisma: PrismaService
   ) {}
@@ -227,7 +229,8 @@ export class DatabaseUtil {
       'affiliations': this.Affiliation,
       'mobile_devices': this.MobileDevice,
       'requests': this.Request,
-      // ... agregar más modelos según sea necesario
+      'residues': this.Residue,
+      'authorized_operations': this.AuthorizedOperation,
     };
 
     const model = modelMap[modelName];

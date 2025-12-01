@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -11,4 +5,113 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+model companies {
+  id                BigInt              @id @default(autoincrement())
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  name              String?
+  address           String?
+  email             String?
+  phone             String?
+  code              String?             @default("25") @db.VarChar
+  company_type      BigInt?
+  types             types?              @relation(fields: [company_type], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  operations_detail operations_detail[]
+  plants            plants[]
+  residues          residues[]
+  users             users[]
+}
+
+model operations_detail {
+  id                                             BigInt     @id @default(autoincrement())
+  created_at                                     DateTime   @default(now()) @db.Timestamptz(6)
+  residue_id                                     BigInt?
+  previous_status                                BigInt?
+  current_status                                 BigInt?
+  obs                                            String?
+  company_id                                     BigInt?
+  plant_id                                       BigInt?
+  companies                                      companies? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  types_operations_detail_current_statusTotypes  types?     @relation("operations_detail_current_statusTotypes", fields: [current_status], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  plants                                         plants?    @relation(fields: [plant_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  types_operations_detail_previous_statusTotypes types?     @relation("operations_detail_previous_statusTotypes", fields: [previous_status], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  residues                                       residues?  @relation(fields: [residue_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model plants {
+  id                BigInt              @id @default(autoincrement())
+  company_id        BigInt?
+  code              String?             @default("50") @db.VarChar
+  name              String?
+  address           String?
+  latitude          Decimal?            @db.Decimal
+  longitude         Decimal?            @db.Decimal
+  status            BigInt?
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  operations_detail operations_detail[]
+  companies         companies?          @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  types             types?              @relation(fields: [status], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  residues          residues[]
+}
+
+model residues {
+  id                                     BigInt              @id @default(autoincrement())
+  created_at                             DateTime            @default(now()) @db.Timestamptz(6)
+  company_id                             BigInt?
+  name                                   String?             @default("500") @db.VarChar
+  residue_type                           BigInt?
+  status_type                            BigInt?
+  unit_measurement                       BigInt?
+  waste_generation_date                  DateTime?           @db.Date
+  quantity                               Decimal?            @db.Decimal
+  status                                 BigInt?
+  plant_id                               BigInt?
+  user_operator                          BigInt?
+  operations_detail                      operations_detail[]
+  companies                              companies?          @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  plants                                 plants?             @relation(fields: [plant_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  types_residues_residue_typeTotypes     types?              @relation("residues_residue_typeTotypes", fields: [residue_type], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  types_residues_statusTotypes           types?              @relation("residues_statusTotypes", fields: [status], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  types_residues_status_typeTotypes      types?              @relation("residues_status_typeTotypes", fields: [status_type], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  types_residues_unit_measurementTotypes types?              @relation("residues_unit_measurementTotypes", fields: [unit_measurement], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users                                  users?              @relation(fields: [user_operator], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model types {
+  id                                                         BigInt              @id @default(autoincrement())
+  created_at                                                 DateTime            @default(now()) @db.Timestamptz(6)
+  category                                                   String?             @default("250") @db.VarChar
+  abbr                                                       String?             @default("50") @db.VarChar
+  name                                                       String?             @default("500") @db.VarChar
+  description                                                String?
+  additional_fields                                          Json?
+  order_col                                                  BigInt?
+  companies                                                  companies[]
+  operations_detail_operations_detail_current_statusTotypes  operations_detail[] @relation("operations_detail_current_statusTotypes")
+  operations_detail_operations_detail_previous_statusTotypes operations_detail[] @relation("operations_detail_previous_statusTotypes")
+  plants                                                     plants[]
+  residues_residues_residue_typeTotypes                      residues[]          @relation("residues_residue_typeTotypes")
+  residues_residues_statusTotypes                            residues[]          @relation("residues_statusTotypes")
+  residues_residues_status_typeTotypes                       residues[]          @relation("residues_status_typeTotypes")
+  residues_residues_unit_measurementTotypes                  residues[]          @relation("residues_unit_measurementTotypes")
+  users                                                      users[]
+}
+
+model users {
+  id         BigInt     @id @default(autoincrement())
+  code       String?    @default("8") @db.VarChar
+  password   String?
+  names      String?
+  last_names String?
+  birth_date DateTime?  @db.Date
+  gender     Boolean?
+  email      String?
+  phone      String?
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
+  company_id BigInt?
+  user_type  BigInt?
+  residues   residues[]
+  companies  companies? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  types      types?     @relation(fields: [user_type], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
