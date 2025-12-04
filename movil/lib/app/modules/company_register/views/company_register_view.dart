@@ -267,7 +267,7 @@ class CompanyRegisterView extends GetView<CompanyRegisterController> {
                           children: [
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: controller.companyType.value == "EG" ? mxDeHexAColor(COLOR_PRIMARIO) : Colors.white
+                                backgroundColor: controller.companyType.value == "EG" ? mxDeHexAColor(COLOR_APROBADO) : Colors.white
                               ),
                               onPressed: () {
                                 controller.companyType.value = "EG";
@@ -276,13 +276,13 @@ class CompanyRegisterView extends GetView<CompanyRegisterController> {
                                 "EG\nGenerador",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: controller.companyType.value == "EG" ? Colors.white : mxDeHexAColor(COLOR_PRIMARIO)
+                                  color: controller.companyType.value == "EG" ? Colors.white : mxDeHexAColor(COLOR_APROBADO)
                                 ),
                               )
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: controller.companyType.value == "EO" ? mxDeHexAColor(COLOR_PRIMARIO) : Colors.white
+                                backgroundColor: controller.companyType.value == "EO" ? mxDeHexAColor(COLOR_APROBADO) : Colors.white
                               ),
                               onPressed: () {
                                 controller.companyType.value = "EO";
@@ -291,7 +291,7 @@ class CompanyRegisterView extends GetView<CompanyRegisterController> {
                                 "EO\nOperador",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: controller.companyType.value == "EO" ? Colors.white : mxDeHexAColor(COLOR_PRIMARIO)
+                                  color: controller.companyType.value == "EO" ? Colors.white : mxDeHexAColor(COLOR_APROBADO)
                                 ),
                               )
                             )
@@ -371,6 +371,22 @@ class CompanyRegisterView extends GetView<CompanyRegisterController> {
                           keyboardType: TextInputType.number,
                           dense: true,
                         ),
+                        SizedBox(height: 5,),
+                        constructorCampoDeTexto(
+                          'Correo Electrónico',
+                          controller.userEmail,
+                          maxLength: 200,
+                          keyboardType: TextInputType.number,
+                          dense: true,
+                        ),
+                        SizedBox(height: 5,),
+                        constructorCampoDeTexto(
+                          'Número de Celular',
+                          controller.userPhone,
+                          maxLength: 200,
+                          keyboardType: TextInputType.number,
+                          dense: true,
+                        ),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -384,10 +400,10 @@ class CompanyRegisterView extends GetView<CompanyRegisterController> {
                                     backgroundColor: mxDeHexAColor(COLOR_PRIMARIO)
                                   ),
                                   onPressed: () {
-                                    controller.verifyCompany();
+                                    controller.register();
                                   }, 
                                   child: Text(
-                                    "Verificar RUC",
+                                    "Registrar Empresa",
                                     style: TextStyle(
                                       color: Colors.white
                                     ),

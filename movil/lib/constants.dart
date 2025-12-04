@@ -1,14 +1,17 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 
 const COLOR_PRIMARIO = '#178a30';
+const COLOR_APROBADO = "#144AA7";
 const COLOR_SECUNDARIO = '#9EE98F';
 const BG_LIGHT = '#FDFDFD';
 const APP_NAME = 'movil-app-001';
-const USER_READ = "ulectura";
-const PASSWORD_READ = "123456@.";
+const USER_READ = "U001";
+const PASSWORD_READ = "1234";
 
 const API_URI = "http://192.168.1.18:3000/api";
 
@@ -161,6 +164,22 @@ void mxMensajePersonalizadoModal(String txTitulo,
       ),
     ),
   ), barrierDismissible: false);
+}
+
+String generateTextRandom(int size) {
+  final random = Random.secure();
+  const characters = 'abcdefghijklmnopqrstuvwxyz'
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+      '0123456789'
+      '!@#\$%^&*()_-+=<>?';
+  
+  final result = StringBuffer();
+  
+  for (var i = 0; i < size; i++) {
+    result.write(characters[random.nextInt(characters.length)]);
+  }
+  
+  return result.toString();
 }
 
 

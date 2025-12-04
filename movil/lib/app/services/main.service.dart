@@ -73,4 +73,19 @@ class MainAPI extends GetxController with StateMixin<dynamic> {
       return err.toString();
     }
   }
+
+  Future<dynamic> setEntityBy(String entity, dynamic body) async {
+    try {
+      final url = Uri.parse('$uri/$entity/create');
+      
+      Map<String, String> headers = await getHeaders();
+      var response = await http.post(url, body: jsonEncode(body), headers: headers);
+      Map<String, dynamic> result = jsonDecode(response.body) as Map<String, dynamic>;
+      print(result);
+      return result;
+    } catch (err) {
+      print(err);
+      return err.toString();
+    }
+  }
 }
