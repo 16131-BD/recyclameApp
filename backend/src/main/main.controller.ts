@@ -120,6 +120,7 @@ export class MainController {
 
   @Post('login')
   async login(@Body() body: LoginDto) {
+    console.log(body);
     return this.mainService.login(body.filter);
   }
 }

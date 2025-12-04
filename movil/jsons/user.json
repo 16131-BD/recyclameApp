@@ -1,0 +1,14 @@
+{
+  "id?": 1,
+  "code?": "U009",
+  "names?": "Diego",
+  "last_names?": "Alvarado",
+  "birth_date?": "1982-02-14T00:00:00.000Z",
+  "gender?": true,
+  "email?": "diego.alvarado@company9.pe",
+  "phone?": "999100901",
+  "created_at?": "2025-11-30T23:30:34.239Z",
+  "company_id?": 9,
+  "user_type?": 10,
+  "token?": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiY29kZSI6IlUwMDkiLCJuYW1lcyI6IkRpZWdvIiwibGFzdF9uYW1lcyI6IkFsdmFyYWRvIiwiYmlydGhfZGF0ZSI6IjE5ODItMDItMTRUMDA6MDA6MDAuMDAwWiIsImdlbmRlciI6dHJ1ZSwiZW1haWwiOiJkaWVnby5hbHZhcmFkb0Bjb21wYW55OS5wZSIsInBob25lIjoiOTk5MTAwOTAxIiwiY3JlYXRlZF9hdCI6IjIwMjUtMTEtMzBUMjM6MzA6MzQuMjM5WiIsImNvbXBhbnlfaWQiOjksInVzZXJfdHlwZSI6MTAsImlhdCI6MTc2NDgzMDUzMiwiZXhwIjoxNzY0ODQ4NTMyfQ.1RPkHLaxjpL1ZHJ5OPiXEd9uws2LOPuPB1d__uWlTwg"
+}
