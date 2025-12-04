@@ -328,11 +328,24 @@
 .type-badge {
   display: inline-block;
   padding: 0.25rem 0.625rem;
-  background: #ede9fe;
-  color: #6d28d9;
   font-size: 0.75rem;
   font-weight: 500;
   border-radius: 9999px;
+}
+
+.type-badge-default {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.type-badge-gen {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.type-badge-ope {
+  background: #fef3c7;
+  color: #b45309;
 }
 
 /* Status Badge */

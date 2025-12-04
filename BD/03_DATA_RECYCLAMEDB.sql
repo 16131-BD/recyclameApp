@@ -1,283 +1,247 @@
--- Tabla: types
+-- ======================================================
+-- RECYCLAME DATABASE - DATOS INICIALES
+-- Archivo: 03_DATA_RECYCLAMEDB.sql
+-- Descripción: Datos maestros y seed de prueba
+-- ======================================================
+
+-- ======================================================
+-- 1. TIPOS DE USUARIO (user_type)
+-- ======================================================
+INSERT INTO public.types (category, abbr, name, description, order_col)
+VALUES
+    ('user_type', 'ADM', 'Administrador', 'Administrador del sistema con acceso total', 1),
+    ('user_type', 'PRI', 'Principal', 'Usuario principal de una empresa (1 por empresa)', 2),
+    ('user_type', 'SEC', 'Secundario', 'Usuario secundario de una empresa con permisos limitados', 3)
+ON CONFLICT (category, abbr) DO UPDATE 
+SET name = EXCLUDED.name, description = EXCLUDED.description, order_col = EXCLUDED.order_col;
+
+-- ======================================================
+-- 2. TIPOS DE EMPRESA (company_type)
+-- ======================================================
 INSERT INTO public.types (category, abbr, name, description, additional_fields, order_col)
 VALUES
-('company_type', 'GEN', 'Generador de Residuos', 
- 'Empresa que genera residuos sólidos y debe declararlos en el sistema.',
- '{"requires_plan": true}', 1),
+    ('company_type', 'GEN', 'Generador', 
+     'Empresa generadora de residuos sólidos que debe declararlos en el sistema.',
+     '{"requires_plan": true}', 1),
+    ('company_type', 'OPE', 'Operador', 
+     'Empresa operadora de residuos sólidos que realiza operaciones de manejo.',
+     '{"needs_infra": true}', 2)
+ON CONFLICT (category, abbr) DO UPDATE 
+SET name = EXCLUDED.name, description = EXCLUDED.description, order_col = EXCLUDED.order_col;
 
-('company_type', 'TRA', 'Transportista Autorizado', 
- 'Empresa encargada del transporte de residuos desde el generador hasta la planta.',
- '{"vehicle_certification": true}', 2),
-
-('company_type', 'OPE', 'Operador de Residuos', 
- 'Empresa que realiza operaciones de manejo de residuos sólidos.',
- '{"needs_infra": true}', 3),
-
-('company_type', 'PLA', 'Planta de Tratamiento', 
- 'Empresa con instalaciones para el tratamiento, valorización o disposición final.',
- '{"treatment_types": ["reciclaje","incineración","compostaje"]}', 4),
-
-('company_type', 'REC', 'Centro de Acopio / Reciclaje', 
- 'Empresa dedicada al acopio, clasificación o reciclaje de residuos.',
- '{"receives_residues": true}', 5),
-
-('company_type', 'TRI', 'Planta de Transferencia', 
- 'Infraestructura donde los residuos son concentrados y redistribuidos.',
- '{"max_capacity_tons": 40}', 6),
-
-('company_type', 'ALM', 'Almacén Temporal Autorizado', 
- 'Establecimiento para almacenamiento temporal antes del transporte o disposición.',
- '{"requires_permit": true}', 7),
-
-('company_type', 'MUN', 'Municipalidad / Autoridad Local', 
- 'Entidad que regula, fiscaliza y gestiona la recolección y operación.',
- '{"role": "fiscalizador"}', 8),
-('user_type', 'ADM', 'Administrador', 'Usuario con privilegios administrativos', null, 1),
-('user_type', 'OPE', 'Operador', 'Usuario encargado de la gestión operativa', null, 2),
-('user_type', 'SUP', 'Supervisor', 'Encargado de supervisar procesos', null, 3),
-('residue_type', 'PLA', 'Plástico', 'Residuos de tipo plástico', NULL ,1),
-('residue_type', 'PAP', 'Papel', 'Residuos de tipo papel', NULL ,2),
-('residue_type', 'MET', 'Metal', 'Residuos metálicos', NULL ,3),
-('residue_type', 'ORG', 'Orgánico', 'Residuos biodegradables', NULL ,4),
-('main_status', 'ACT', 'Activo', 'Elemento en funcionamiento', NULL ,1),
-('main_status', 'INA', 'Inactivo', 'Elemento fuera de servicio', NULL ,2),
-('residue_status', 'PEN', 'Pendiente', 'A la espera de procesamiento', NULL ,1),
-('residue_status', 'PRO', 'Procesado', 'Residuo procesado correctamente', NULL ,2),
-('residue_status', 'TRA', 'En tránsito', 'Residuo en traslado', NULL ,3),
-('residue_status', 'DES', 'Desechado', 'Residuo eliminado', NULL ,4),
-('plant_status', 'OPE', 'Operativa', 'Planta activa', NULL ,1),
-('plant_status', 'MNT', 'Mantenimiento', 'Planta en mantenimiento', NULL ,2),
-('plant_status', 'CER', 'Cerrada', 'Planta fuera de servicio', NULL ,3),
-('residue_status_type', 'S', 'Sólido', 'Estado del Residuo - Sólido', NULL ,1),
-('residue_status_type', 'SS', 'Semi Sólido', 'Estado del Residuo - Semi Sólido', NULL ,2),
-('residue_status_type', 'L', 'Liquido', 'Estado del Residuo - Liquido', NULL ,3),
-('residue_status_type', 'G', 'Gaseoso', 'Estado del Residuo - Gaseoso', NULL ,4)
-;
-
-
--- Tabla: companies
-INSERT INTO public.companies (name, address, email, phone, code, company_type)
+-- ======================================================
+-- 3. TIPOS DE RESIDUO (residue_type)
+-- ======================================================
+INSERT INTO public.types (category, abbr, name, description, order_col)
 VALUES
-('EcoGestión SAC', 'Av. Los Olivos 345, Lima', 'contacto@ecogestion.pe', '013456789', 'CG001', 1),
-('Residuos Perú SRL', 'Jr. Libertad 221, Arequipa', 'info@residuosperu.com', '054234567', 'CG002', 1),
-('GreenCycle Operadores SAC', 'Av. Industrial 890, Callao', 'operaciones@greencycle.pe', '015678234', 'OP001', 2),
-('LimpioTrans SAC', 'Carretera Central Km 12.5, Lima', 'soporte@limpiotrans.pe', '016789234', 'TR001', 3),
-('BioRecolectores EIRL', 'Mz B Lt 14, Trujillo', 'ventas@biorecolectores.com', '044123456', 'CG003', 1),
-('EcoTransportes Andinos SAC', 'Av. Túpac Amaru 2340, Lima Norte', 'admin@ecotransandinos.pe', '017456321', 'TR002', 3),
-('Planta Verde SAC', 'Zona Industrial 4, Chiclayo', 'planta@plantaverde.pe', '074223344', 'PT001', 4),
-('Soluciones Ambientales del Sur', 'Av. Circunvalación 543, Cusco', 'ambiental@sasur.pe', '084893223', 'OP002', 2),
-('ReciAndes SAC', 'Calle Los Laureles 909, Huancayo', 'contacto@reciandes.pe', '064552211', 'CG004', 1),
-('Operadora EcoGlobal SAC', 'Av. Elmer Faucett 800, Callao', 'info@ecoglobal.pe', '015667889', 'OP003', 2),
-('EcoIndustria SAC', 'Av. Los Álamos 345, Lima', 'contacto@ecoindustria.pe', '987654321', 'ECO001', 1),
-('ReciclaPlus SRL', 'Calle Verde 221, Arequipa', 'info@reciclaplus.pe', '912345678', 'REC002', 3),
-('Comercial Andina', 'Jr. Grau 789, Cusco', 'ventas@andina.pe', '923456789', 'COM003', 2),
-('BioRecicla Perú', 'Av. Primavera 120, Trujillo', 'biorecicla@peru.pe', '934567890', 'BIO004', 3),
-('Metales del Sur', 'Av. Pachacútec 999, Tacna', 'contacto@metalesur.pe', '945678901', 'MET005', 1),
-('PlastiGreen EIRL', 'Av. Los Héroes 554, Lima', 'info@plastigreen.pe', '987654322', 'PG006', 3),
-('EcoAndes SAC', 'Av. Arequipa 1234, Lima', 'contacto@ecoandes.pe', '987111333', 'EA007', 1),
-('ReciVida SRL', 'Calle Los Jazmines 45, Arequipa', 'contacto@recivida.pe', '988222111', 'RV008', 3),
-('Comercial Inka', 'Jr. Ayacucho 789, Cusco', 'ventas@inkacom.pe', '987333444', 'CI009', 2),
-('Metales Perú SAC', 'Av. República 300, Lima', 'info@metalesperu.pe', '986555666', 'MP010', 1),
-('VerdeCircular', 'Av. Grau 222, Lima', 'info@verdecircular.pe', '987100200', 'VC011', 3),
-('BioSierra', 'Av. Huascar 500, Huaraz', 'contacto@biosierra.pe', '977300900', 'BS012', 1),
-('ReciclaNorte', 'Av. Panamericana Norte 401, Piura', 'info@reciclanorte.pe', '986400300', 'RN013', 3),
-('EcoTacna', 'Calle San Martín 80, Tacna', 'info@ecotacna.pe', '988001122', 'ET014', 1),
-('GreenSolutions', 'Av. Bolívar 555, Lima', 'info@greensolutions.pe', '999123777', 'GS015', 3),
-('BioAmazonas', 'Av. Iquitos 303, Iquitos', 'contacto@bioamazonas.pe', '955123000', 'BA016', 1),
-('EcoCusco', 'Av. Collasuyo 45, Cusco', 'contacto@ecocusco.pe', '988333111', 'EC017', 3),
-('ReciclaSur', 'Av. La Cultura 890, Arequipa', 'info@reciclasur.pe', '987444555', 'RS018', 3),
-('Comercial Lima', 'Jr. Unión 100, Lima', 'ventas@comlima.pe', '944111555', 'CL019', 2),
-('InnovaMetales', 'Av. Argentina 999, Lima', 'info@innovametales.pe', '988567321', 'IM020', 1),
-('EcoSelva', 'Av. Tarapoto 350, Tarapoto', 'info@ecoselva.pe', '956222111', 'ES021', 1),
-('PlastiRecicla', 'Av. Huancayo 250, Huancayo', 'info@plastirecicla.pe', '987556644', 'PR022', 3),
-('VerdeTech', 'Av. Brasil 1200, Lima', 'info@verdetech.pe', '999776655', 'VT023', 1),
-('MetalesEco', 'Av. Balta 600, Chiclayo', 'info@metaleco.pe', '966778899', 'ME024', 1),
-('ReciHuacho', 'Av. San Pedro 22, Huacho', 'info@recihuacho.pe', '977889900', 'RH025', 3),
-('EcoAndina Norte', 'Calle Lima 145, Piura', 'contacto@ecoandinanorte.pe', '955112233', 'EAN026', 3),
-('ReciclaCentro', 'Av. Central 900, Huancayo', 'info@reciclacentro.pe', '977445566', 'RC027', 3),
-('GreenMet', 'Av. Mariscal 111, Arequipa', 'info@greenmet.pe', '999445566', 'GM028', 1),
-('BioMetales', 'Av. América 45, Trujillo', 'biometales@peru.pe', '944556677', 'BM029', 1),
-('EcoPower', 'Av. Salaverry 950, Lima', 'info@ecopower.pe', '955223344', 'EP030', 1),
-('ReciAndes', 'Calle Cusco 88, Cusco', 'info@reciandes.pe', '911556677', 'RA031', 3),
-('VerdeCentro', 'Av. San Luis 340, Lima', 'info@verdecentro.pe', '966556677', 'VC032', 3),
-('EcoSur SAC', 'Av. Los Andes 900, Arequipa', 'contacto@ecosur.pe', '955889900', 'ES033', 3),
-('Recimetal', 'Av. Perú 101, Lima', 'info@recimetal.pe', '944667788', 'RM034', 1),
-('EcoValle', 'Av. Vallecito 400, Arequipa', 'info@ecovalle.pe', '977556688', 'EV035', 1),
-('ReciLima', 'Av. Los Álamos 555, Lima', 'info@recilima.pe', '977441122', 'RL036', 3),
-('MetalAndes', 'Av. Los Héroes 505, Cusco', 'info@metalandes.pe', '933222444', 'MA037', 1),
-('Comercial del Sur', 'Av. Lima 302, Arequipa', 'ventas@comsur.pe', '955334455', 'CS038', 2),
-('ReciclaPacífico', 'Av. Grau 707, Piura', 'contacto@recipacifico.pe', '977556644', 'RP039', 3),
-('BioEco', 'Av. Central 44, Lima', 'contacto@bioeco.pe', '966334422', 'BE040', 1),
-('EcoAmazonas', 'Av. Nauta 310, Iquitos', 'info@ecoamazonas.pe', '955667788', 'EA041', 1),
-('MetalesHuacho', 'Av. Lima 250, Huacho', 'info@metalhuacho.pe', '977223344', 'MH042', 1),
-('EcoHuancayo', 'Av. Ferrocarril 600, Huancayo', 'info@ecohuancayo.pe', '955778899', 'EH043', 3),
-('ReciPerú', 'Av. Abancay 333, Lima', 'info@reciperu.pe', '955665544', 'RP044', 3),
-('Comercial Global', 'Av. Petit Thouars 333, Lima', 'ventas@comglobal.pe', '944223344', 'CG045', 2),
-('BioRecicla Norte', 'Av. Panamericana Norte 120, Piura', 'contacto@bionorte.pe', '955223300', 'BN046', 3),
-('MetalPro', 'Av. Argentina 880, Lima', 'info@metalpro.pe', '911334455', 'MP047', 1),
-('EcoAndina Sur', 'Av. Arequipa 333, Arequipa', 'info@ecoandinasur.pe', '955223355', 'EAS048', 3),
-('VerdeAndes', 'Av. Grau 600, Cusco', 'info@verdeandes.pe', '955667799', 'VA049', 3),
-('ReciclaSelva', 'Av. Nauta 222, Iquitos', 'info@reciclaselva.pe', '966778855', 'RS050', 3),
-('MetalAndina', 'Av. República 44, Trujillo', 'info@metalandina.pe', '955331122', 'MA051', 1),
-('EcoRecicla', 'Av. Salaverry 77, Lima', 'info@ecorecicla.pe', '977889911', 'ER052', 3),
-('VerdeNorte', 'Av. Grau 555, Piura', 'info@verdenorte.pe', '955441122', 'VN053', 3),
-('EcoLife', 'Av. El Sol 808, Cusco', 'info@ecolife.pe', '955778866', 'EL054', 3),
-('ReciMundo', 'Av. Aviación 234, Lima', 'info@recimundo.pe', '955223388', 'RM055', 3);
+    ('residue_type', 'PLA', 'Plástico', 'Residuos de tipo plástico', 1),
+    ('residue_type', 'PAP', 'Papel', 'Residuos de tipo papel', 2),
+    ('residue_type', 'MET', 'Metal', 'Residuos metálicos', 3),
+    ('residue_type', 'ORG', 'Orgánico', 'Residuos biodegradables', 4),
+    ('residue_type', 'VID', 'Vidrio', 'Residuos de vidrio', 5),
+    ('residue_type', 'ELE', 'Electrónico', 'Residuos de aparatos electrónicos', 6),
+    ('residue_type', 'PEL', 'Peligroso', 'Residuos peligrosos', 7),
+    ('residue_type', 'OTR', 'Otros', 'Otros tipos de residuos', 8)
+ON CONFLICT (category, abbr) DO UPDATE 
+SET name = EXCLUDED.name, description = EXCLUDED.description, order_col = EXCLUDED.order_col;
 
-INSERT INTO public.users
-(code, password, names, last_names, birth_date, gender, email, phone, company_id, user_type)
+-- ======================================================
+-- 4. ESTADOS DE RESIDUO (residue_status_type)
+-- ======================================================
+INSERT INTO public.types (category, abbr, name, description, order_col)
 VALUES
-('U009', '1234', 'Diego', 'Alvarado', '1982-02-14', TRUE, 'diego.alvarado@company9.pe', '999100901', 9, 10),
-('U010', '1234', 'Fernanda', 'Lopez', '1990-07-03', FALSE, 'fernanda.lopez@company10.pe', '999201002', 10, 9),
-('U011', '1234', 'Alberto', 'Santos', '1978-11-21', TRUE, 'alberto.santos@company11.pe', '999301103', 11, 10),
-('U012', '1234', 'Camila', 'Vargas', '1995-01-17', FALSE, 'camila.vargas@company12.pe', '999401204', 12, 11),
-('U013', '1234', 'Ricardo', 'Mendoza', '1980-05-30', TRUE, 'ricardo.mendoza@company13.pe', '999501305', 13, 9),
-('U014', '1234', 'Natalia', 'Quispe', '1988-09-09', FALSE, 'natalia.quispe@company14.pe', '999601406', 14, 10),
-('U015', '1234', 'Jorge', 'Castillo', '1979-12-02', TRUE, 'jorge.castillo@company15.pe', '999701507', 15, 9),
-('U016', '1234', 'Paola', 'Guzman', '1992-06-25', FALSE, 'paola.guzman@company16.pe', '999801608', 16, 11),
-('U017', '1234', 'Sergio', 'Ramirez', '1985-03-11', TRUE, 'sergio.ramirez@company17.pe', '999901709', 17, 10),
-('U018', '1234', 'Lorena', 'Flores', '1998-08-19', FALSE, 'lorena.flores@company18.pe', '999112210', 18, 10),
-('U019', '1234', 'Hugo', 'Cruz', '1976-10-04', TRUE, 'hugo.cruz@company19.pe', '999212311', 19, 9),
-('U020', '1234', 'Adriana', 'Lozada', '1983-04-29', FALSE, 'adriana.lozada@company20.pe', '999312412', 20, 11),
-('U021', '1234', 'Manuel', 'Pacheco', '1991-09-12', TRUE, 'manuel.pacheco@company21.pe', '999412513', 21, 10),
-('U022', '1234', 'Rosa', 'Navarro', '1987-11-28', FALSE, 'rosa.navarro@company22.pe', '999512614', 22, 9),
-('U023', '1234', 'Esteban', 'Herrera', '1977-07-07', TRUE, 'esteban.herrera@company23.pe', '999612715', 23, 10),
-('U024', '1234', 'Mónica', 'Salazar', '1994-02-18', FALSE, 'monica.salazar@company24.pe', '999712816', 24, 11),
-('U025', '1234', 'Víctor', 'Ortiz', '1981-12-30', TRUE, 'victor.ortiz@company25.pe', '999812917', 25, 9),
-('U026', '1234', 'Juliana', 'Reyes', '1996-03-05', FALSE, 'juliana.reyes@company26.pe', '999913018', 26, 10),
-('U027', '1234', 'Pablo', 'Galarza', '1975-06-16', TRUE, 'pablo.galarza@company27.pe', '999014119', 27, 9),
-('U028', '1234', 'Carolina', 'Vega', '1989-10-02', FALSE, 'carolina.vega@company28.pe', '999114220', 28, 11),
-('U029', '1234', 'Andrés', 'Rios', '1984-01-23', TRUE, 'andres.rios@company29.pe', '999214321', 29, 10),
-('U030', '1234', 'Inés', 'Salinas', '1993-05-14', FALSE, 'ines.salinas@company30.pe', '999314422', 30, 9),
-('U031', '1234', 'Óscar', 'Poma', '1976-09-01', TRUE, 'oscar.poma@company31.pe', '999414523', 31, 10),
-('U032', '1234', 'Daniela', 'Mora', '1986-11-20', FALSE, 'daniela.mora@company32.pe', '999514624', 32, 11),
-('U033', '1234', 'Leandro', 'Tapia', '1979-02-27', TRUE, 'leandro.tapia@company33.pe', '999614725', 33, 9),
-('U034', '1234', 'Mariana', 'Caro', '1997-08-08', FALSE, 'mariana.caro@company34.pe', '999714826', 34, 10),
-('U035', '1234', 'Félix', 'Bellido', '1982-04-10', TRUE, 'felix.bellido@company35.pe', '999814927', 35, 10),
-('U036', '1234', 'Silvana', 'Urbina', '1990-12-15', FALSE, 'silvana.urbina@company36.pe', '999915028', 36, 11),
-('U037', '1234', 'Raúl', 'Chávez', '1978-03-03', TRUE, 'raul.chavez@company37.pe', '999015129', 37, 9),
-('U038', '1234', 'Patricia', 'Salcedo', '1985-07-26', FALSE, 'patricia.salcedo@company38.pe', '999115230', 38, 10),
-('U039', '1234', 'Nelson', 'Flores', '1981-01-19', TRUE, 'nelson.flores@company39.pe', '999215331', 39, 10),
-('U040', '1234', 'Gabriela', 'Paredes', '1992-06-02', FALSE, 'gabriela.paredes@company40.pe', '999315432', 40, 11),
-('U041', '1234', 'Marco', 'Castañeda', '1977-11-11', TRUE, 'marco.castaneda@company41.pe', '999415533', 41, 9),
-('U042', '1234', 'Elisa', 'Torres', '1988-02-20', FALSE, 'elisa.torres@company42.pe', '999515634', 42, 10),
-('U043', '1234', 'Gustavo', 'Pinto', '1975-05-05', TRUE, 'gustavo.pinto@company43.pe', '999615735', 43, 10),
-('U044', '1234', 'Verónica', 'Mendoza', '1991-09-30', FALSE, 'veronica.mendoza@company44.pe', '999715836', 44, 11),
-('U045', '1234', 'Nahuel', 'Ramos', '1983-08-13', TRUE, 'nahuel.ramos@company45.pe', '999815937', 45, 9),
-('U046', '1234', 'Alejandra', 'Fuentes', '1994-03-27', FALSE, 'alejandra.fuentes@company46.pe', '999916038', 46, 10),
-('U047', '1234', 'César', 'Valencia', '1980-10-09', TRUE, 'cesar.valencia@company47.pe', '999016139', 47, 9),
-('U048', '1234', 'Bianca', 'Loayza', '1987-12-01', FALSE, 'bianca.loayza@company48.pe', '999116240', 48, 11),
-('U049', '1234', 'Armando', 'Córdova', '1979-04-06', TRUE, 'armando.cordova@company49.pe', '999216341', 49, 10),
-('U050', '1234', 'Daniela', 'Sifuentes', '1996-07-18', FALSE, 'daniela.sifuentes@company50.pe', '999316442', 50, 10),
-('U051', '1234', 'Hernán', 'Pérez', '1984-11-02', TRUE, 'hernan.perez@company51.pe', '999416543', 51, 9),
-('U052', '1234', 'Mirella', 'Villacorta', '1993-02-08', FALSE, 'mirella.villacorta@company52.pe', '999516644', 52, 11),
-('U053', '1234', 'Emanuel', 'Cifuentes', '1976-06-21', TRUE, 'emanuel.cifuentes@company53.pe', '999616745', 53, 9),
-('U054', '1234', 'Rocío', 'Hurtado', '1990-01-29', FALSE, 'rocio.hurtado@company54.pe', '999716846', 54, 10),
-('U055', '1234', 'Bruno', 'Yupanqui', '1982-09-15', TRUE, 'bruno.yupanqui@company55.pe', '999816947', 55, 10),
-('U056', '1234', 'Cecilia', 'Tapia', '1978-12-22', FALSE, 'cecilia.tapia@company1.pe', '999917048', 1, 11),
-('U057', '1234', 'Iván', 'Salgado', '1986-05-09', TRUE, 'ivan.salgado@company2.pe', '999017149', 2, 9),
-('U058', '1234', 'Noelia', 'Mujica', '1995-10-28', FALSE, 'noelia.mujica@company3.pe', '999117250', 3, 10),
-('U059', '1234', 'Tomás', 'Benítez', '1981-03-16', TRUE, 'tomas.benitez@company4.pe', '999217351', 4, 9),
-('U060', '1234', 'Rosa María', 'Galarreta', '1989-06-07', FALSE, 'rosa.galarreta@company5.pe', '999317452', 5, 11),
-('U061', '1234', 'Fabián', 'Cárdenas', '1977-08-23', TRUE, 'fabian.cardenas@company6.pe', '999417553', 6, 10),
-('U062', '1234', 'Magdalena', 'Roldán', '1992-12-12', FALSE, 'magdalena.roldan@company7.pe', '999517654', 7, 9),
-('U063', '1234', 'Luis', 'Herrera', '1983-01-01', TRUE, 'luis.herrera@company8.pe', '999617755', 8, 10),
-('U064', '1234', 'Carla', 'Canto', '1994-05-05', FALSE, 'carla.canto@company9.pe', '999717856', 9, 11),
-('U065', '1234', 'Mateo', 'Gomez', '1980-11-18', TRUE, 'mateo.gomez@company10.pe', '999817957', 10, 9),
-('U066', '1234', 'Valeria', 'Sierra', '1997-02-02', FALSE, 'valeria.sierra@company11.pe', '999918058', 11, 10),
-('U067', '1234', 'Gonzalo', 'Molina', '1976-07-29', TRUE, 'gonzalo.molina@company12.pe', '999018159', 12, 9),
-('U068', '1234', 'Jimena', 'Rojas', '1985-10-20', FALSE, 'jimena.rojas@company13.pe', '999118260', 13, 11);
+    ('residue_status_type', 'S', 'Sólido', 'Estado del Residuo - Sólido', 1),
+    ('residue_status_type', 'SS', 'Semi Sólido', 'Estado del Residuo - Semi Sólido', 2),
+    ('residue_status_type', 'L', 'Líquido', 'Estado del Residuo - Líquido', 3),
+    ('residue_status_type', 'G', 'Gaseoso', 'Estado del Residuo - Gaseoso', 4)
+ON CONFLICT (category, abbr) DO UPDATE 
+SET name = EXCLUDED.name, description = EXCLUDED.description, order_col = EXCLUDED.order_col;
 
--- Tabla: plants
-INSERT INTO public.plants
-(company_id, code, name, address, latitude, longitude, status)
+-- ======================================================
+-- 5. ESTADOS PRINCIPALES (main_status)
+-- ======================================================
+INSERT INTO public.types (category, abbr, name, description, order_col)
 VALUES
-(3, 'P001', 'Planta Central Andina', 'Av. Industrial 120 - Lima', -12.0464, -77.0428, NULL),
-(7, 'P002', 'Planta Procesadora Norte', 'Jr. Agricultura 455 - Chiclayo', -6.7784, -79.8440, NULL),
-(12, 'P003', 'Planta Sur Pacífico', 'Av. Marítima 901 - Arequipa', -16.4090, -71.5375, NULL),
-(15, 'P004', 'Planta Logística Santa Rosa', 'Av. Santa Rosa 990 - Lima', -12.0250, -77.0032, NULL),
-(18, 'P005', 'Planta Molino Real', 'Calle Comercio 441 - Trujillo', -8.1116, -79.0289, NULL),
-(21, 'P006', 'Planta San Pedro', 'Av. Industrial 500 - Cusco', -13.5319, -71.9675, NULL),
-(25, 'P007', 'Planta Acopio Los Andes', 'Jr. Grau 150 - Huancayo', -12.0651, -75.2049, NULL),
-(27, 'P008', 'Planta Selecta Pacasmayo', 'Av. Libertad 770 - Pacasmayo', -7.4006, -79.5718, NULL),
-(29, 'P009', 'Planta Alimentos Q', 'Av. Reforma 214 - Piura', -5.1945, -80.6328, NULL),
-(31, 'P010', 'Planta Santa Lucía', 'Av. Los Próceres 899 - Ayacucho', -13.1631, -74.2244, NULL),
-(34, 'P011', 'Planta Central Ejecutiva', 'Calle Progreso 320 - Tacna', -18.0066, -70.2463, NULL),
-(36, 'P012', 'Planta Principal del Sur', 'Av. Arequipa 1120 - Arequipa', -16.4023, -71.5370, NULL),
-(38, 'P013', 'Planta Innovación Sierra', 'Jr. Real 1020 - Huancavelica', -12.7870, -74.9730, NULL),
-(40, 'P014', 'Planta Nueva Esperanza', 'Jr. Esperanza 650 - Chimbote', -9.0745, -78.5936, NULL),
-(43, 'P015', 'Planta Óptima Logística', 'Av. Central 300 - Huaraz', -9.5261, -77.5288, NULL),
-(46, 'P016', 'Planta Green Field', 'Calle Verde 122 - Ica', -14.0678, -75.7286, NULL),
-(49, 'P017', 'Planta Andina XL', 'Av. Andenes 455 - Cajamarca', -7.1617, -78.5128, NULL),
-(52, 'P018', 'Planta del Valle', 'Av. Valle 720 - Moyobamba', -6.0333, -76.9717, NULL),
-(54, 'P019', 'Planta Industrial Omega', 'Av. Progreso 244 - Tumbes', -3.5669, -80.4515, NULL),
-(55, 'P020', 'Planta Reserva Técnica', 'Carretera Panamericana Km 10 - Lima', -12.0500, -77.0500, NULL);
+    ('main_status', 'ACT', 'Activo', 'Elemento en funcionamiento', 1),
+    ('main_status', 'INA', 'Inactivo', 'Elemento fuera de servicio', 2)
+ON CONFLICT (category, abbr) DO UPDATE 
+SET name = EXCLUDED.name, description = EXCLUDED.description, order_col = EXCLUDED.order_col;
 
--- Tabla: residues
--- INSERT INTO public.residues (company_id, name, residue_type, quantity, status, plant_id, user_operator)
--- VALUES
--- (1, 'Residuos de poda', 10, 560.00, 1, 1, 3),
--- (1, 'Latas de aluminio', 11, 95.40, 1, 1, 3),
--- (1, 'Botellas PET', 12, 310.75, 1, 1, 3),
--- (1, 'Papeles de archivo', 13, 420.30, 2, 1, 3),
--- (1, 'Chatarra ferrosa', 11, 780.00, 1, 1, 3),
--- (1, 'Madera sobrante', 10, 150.90, 1, 1, 3),
--- (1, 'Envases de pintura', 12, 67.50, 2, 1, 3),
--- (1, 'Revistas viejas', 13, 98.00, 1, 1, 3),
--- (1, 'Cableado en desuso', 11, 44.60, 1, 1, 3),
--- (1, 'Compost generado', 10, 220.50, 1, 1, 3),
--- (1, 'Residuos de cocina', 10, 330.20, 1, 1, 3),
--- (1, 'Cáscaras de frutas', 10, 185.50, 1, 1, 3),
--- (1, 'Cartón húmedo', 13, 210.00, 2, 1, 3),
--- (1, 'Aluminio triturado', 11, 99.40, 1, 1, 3),
--- (1, 'Tuberías viejas', 11, 300.00, 1, 1, 3),
--- (1, 'Film estirable', 12, 55.70, 1, 1, 3),
--- (1, 'Revistas reciclables', 13, 145.90, 1, 1, 3),
--- (1, 'Aceite usado', 10, 60.30, 2, 1, 3),
--- (1, 'Discos duros en desuso', 11, 32.00, 1, 1, 3),
--- (1, 'Residuos electrónicos', 11, 88.80, 1, 1, 3),
--- (1, 'Cajas de cereal', 13, 134.60, 1, 1, 3),
--- (1, 'Plástico termoformado', 12, 48.20, 2, 1, 3),
--- (1, 'Tapas plásticas', 12, 22.00, 1, 1, 3),
--- (1, 'Sobres manila', 13, 77.50, 1, 1, 3),
--- (1, 'Huesos de comida', 10, 95.20, 1, 1, 3),
--- (1, 'Ferrosa compactada', 11, 510.00, 1, 1, 3),
--- (1, 'Cajas de pizza', 13, 180.10, 2, 1, 3),
--- (1, 'Botellas HDPE', 12, 110.40, 1, 1, 3),
--- (1, 'Cobre reciclable', 11, 40.00, 1, 1, 3),
--- (1, 'Vegetales descompuestos', 10, 260.75, 1, 1, 3);
+-- ======================================================
+-- 6. ESTADOS DE RESIDUO EN PROCESO (residue_status)
+-- ======================================================
+INSERT INTO public.types (category, abbr, name, description, order_col)
+VALUES
+    ('residue_status', 'PEN', 'Pendiente', 'A la espera de procesamiento', 1),
+    ('residue_status', 'PRO', 'Procesado', 'Residuo procesado correctamente', 2),
+    ('residue_status', 'TRA', 'En tránsito', 'Residuo en traslado', 3),
+    ('residue_status', 'DES', 'Desechado', 'Residuo eliminado', 4)
+ON CONFLICT (category, abbr) DO UPDATE 
+SET name = EXCLUDED.name, description = EXCLUDED.description, order_col = EXCLUDED.order_col;
 
--- Tabla: operations_detail
--- INSERT INTO public.operations_detail
--- (residue_id, previous_status, current_status, obs, company_id, plant_id)
--- VALUES
--- (1, 13,14,'Ingreso a proceso',1,1),
--- (1,14,15,'Proceso completado',1,1),
--- (2,13,14,'Ingreso a proceso',1,1),
--- (2,14,16,'Material rechazado por impurezas',1,1),
--- (3,13,14,'Clasificación inicial',2,3),
--- (3,14,15,'Proceso finalizado',2,3),
--- (4,13,14,'Ingreso a compactación',2,3),
--- (5,13,14,'Inicio de tratamiento',3,4),
--- (5,14,15,'Finalizado con éxito',3,4),
--- (6,13,14,'Ingreso a fundición',3,4),
--- (7,13,14,'Separación primaria',4,5),
--- (7,14,15,'Completado',4,5),
--- (8,13,14,'Ingreso a clasificación',5,5),
--- (9,13,14,'Inicio de proceso',5,5),
--- (9,14,15,'Proceso cerrado',5,5),
--- (10,13,14,'Evaluación inicial',1,1),
--- (10,14,16,'Se rechaza por contaminación',1,1),
--- (11,13,14,'Inicio preparación',2,3),
--- (11,14,15,'Entrega a almacen',2,3),
--- (12,13,14,'Revisión inicial',2,3),
--- (13,13,14,'Ingreso',3,4),
--- (13,14,15,'Proceso finalizado',3,4),
--- (14,13,14,'Clasificación',3,4),
--- (15,13,14,'Compactación',4,5),
--- (16,13,14,'Inicio de fundición',5,5),
--- (17,13,14,'Control de calidad',1,1),
--- (17,14,15,'Liberado',1,1),
--- (18,13,14,'Procesando',2,3),
--- (19,13,14,'Tratamiento',3,4),
--- (20,13,14,'Recepción OK',4,5);
+-- ======================================================
+-- 7. ESTADOS DE PLANTA (plant_status)
+-- ======================================================
+INSERT INTO public.types (category, abbr, name, description, order_col)
+VALUES
+    ('plant_status', 'OPE', 'Operativa', 'Planta activa', 1),
+    ('plant_status', 'MNT', 'Mantenimiento', 'Planta en mantenimiento', 2),
+    ('plant_status', 'CER', 'Cerrada', 'Planta fuera de servicio', 3)
+ON CONFLICT (category, abbr) DO UPDATE 
+SET name = EXCLUDED.name, description = EXCLUDED.description, order_col = EXCLUDED.order_col;
+
+-- ======================================================
+-- 8. UNIDADES DE MEDIDA (unit_measurement)
+-- ======================================================
+INSERT INTO public.types (category, abbr, name, description, order_col)
+VALUES
+    ('unit_measurement', 'KG', 'Kilogramos', 'Unidad de peso en kilogramos', 1),
+    ('unit_measurement', 'TN', 'Toneladas', 'Unidad de peso en toneladas', 2),
+    ('unit_measurement', 'LT', 'Litros', 'Unidad de volumen en litros', 3),
+    ('unit_measurement', 'M3', 'Metros cúbicos', 'Unidad de volumen en metros cúbicos', 4),
+    ('unit_measurement', 'UN', 'Unidades', 'Cantidad en unidades', 5)
+ON CONFLICT (category, abbr) DO UPDATE 
+SET name = EXCLUDED.name, description = EXCLUDED.description, order_col = EXCLUDED.order_col;
+
+-- ======================================================
+-- 9. EMPRESAS DE PRUEBA (companies)
+-- ======================================================
+-- Obtener IDs de tipos de empresa
+DO $$
+DECLARE
+    v_gen_id BIGINT;
+    v_ope_id BIGINT;
+BEGIN
+    SELECT id INTO v_gen_id FROM types WHERE category = 'company_type' AND abbr = 'GEN' LIMIT 1;
+    SELECT id INTO v_ope_id FROM types WHERE category = 'company_type' AND abbr = 'OPE' LIMIT 1;
+    
+    -- Insertar empresas generadoras
+    INSERT INTO companies (code, name, address, email, phone, company_type) VALUES
+    ('CG001', 'EcoGestión SAC', 'Av. Los Olivos 345, Lima', 'contacto@ecogestion.pe', '013456789', v_gen_id),
+    ('CG002', 'Residuos Perú SRL', 'Jr. Libertad 221, Arequipa', 'info@residuosperu.com', '054234567', v_gen_id),
+    ('CG003', 'BioRecolectores EIRL', 'Mz B Lt 14, Trujillo', 'ventas@biorecolectores.com', '044123456', v_gen_id),
+    ('CG004', 'ReciAndes SAC', 'Calle Los Laureles 909, Huancayo', 'contacto@reciandes.pe', '064552211', v_gen_id),
+    ('CG005', 'EcoIndustria SAC', 'Av. Los Álamos 345, Lima', 'contacto@ecoindustria.pe', '987654321', v_gen_id),
+    ('CG006', 'Metales del Sur', 'Av. Pachacútec 999, Tacna', 'contacto@metalesur.pe', '945678901', v_gen_id),
+    ('CG007', 'EcoAndes SAC', 'Av. Arequipa 1234, Lima', 'contacto@ecoandes.pe', '987111333', v_gen_id),
+    ('CG008', 'Metales Perú SAC', 'Av. República 300, Lima', 'info@metalesperu.pe', '986555666', v_gen_id)
+    ON CONFLICT (code) DO NOTHING;
+    
+    -- Insertar empresas operadoras
+    INSERT INTO companies (code, name, address, email, phone, company_type) VALUES
+    ('OP001', 'GreenCycle Operadores SAC', 'Av. Industrial 890, Callao', 'operaciones@greencycle.pe', '015678234', v_ope_id),
+    ('OP002', 'Soluciones Ambientales del Sur', 'Av. Circunvalación 543, Cusco', 'ambiental@sasur.pe', '084893223', v_ope_id),
+    ('OP003', 'Operadora EcoGlobal SAC', 'Av. Elmer Faucett 800, Callao', 'info@ecoglobal.pe', '015667889', v_ope_id),
+    ('TR001', 'LimpioTrans SAC', 'Carretera Central Km 12.5, Lima', 'soporte@limpiotrans.pe', '016789234', v_ope_id),
+    ('TR002', 'EcoTransportes Andinos SAC', 'Av. Túpac Amaru 2340, Lima Norte', 'admin@ecotransandinos.pe', '017456321', v_ope_id),
+    ('PT001', 'Planta Verde SAC', 'Zona Industrial 4, Chiclayo', 'planta@plantaverde.pe', '074223344', v_ope_id)
+    ON CONFLICT (code) DO NOTHING;
+END $$;
+
+-- ======================================================
+-- 10. USUARIOS DE PRUEBA (users)
+-- ======================================================
+DO $$
+DECLARE
+    v_pri_id BIGINT;
+    v_sec_id BIGINT;
+    v_adm_id BIGINT;
+    v_company_id BIGINT;
+BEGIN
+    SELECT id INTO v_adm_id FROM types WHERE category = 'user_type' AND abbr = 'ADM' LIMIT 1;
+    SELECT id INTO v_pri_id FROM types WHERE category = 'user_type' AND abbr = 'PRI' LIMIT 1;
+    SELECT id INTO v_sec_id FROM types WHERE category = 'user_type' AND abbr = 'SEC' LIMIT 1;
+    
+    -- Usuario administrador del sistema (sin empresa)
+    INSERT INTO users (code, password, names, last_names, email, phone, company_id, user_type, is_primary, is_active)
+    VALUES ('U001', '1234', 'Admin', 'Sistema', 'admin@recyclame.pe', '999000001', NULL, v_adm_id, FALSE, TRUE)
+    ON CONFLICT (code) DO NOTHING;
+    
+    -- Crear usuarios principales para cada empresa
+    FOR v_company_id IN SELECT id FROM companies ORDER BY id LIMIT 14 LOOP
+        INSERT INTO users (code, password, names, last_names, email, phone, company_id, user_type, is_primary, is_active)
+        SELECT 
+            'U' || LPAD((v_company_id + 1)::TEXT, 3, '0'),
+            '1234',
+            CASE (v_company_id % 5)
+                WHEN 0 THEN 'Carlos'
+                WHEN 1 THEN 'María'
+                WHEN 2 THEN 'Jorge'
+                WHEN 3 THEN 'Ana'
+                ELSE 'Luis'
+            END,
+            CASE (v_company_id % 4)
+                WHEN 0 THEN 'García'
+                WHEN 1 THEN 'López'
+                WHEN 2 THEN 'Martínez'
+                ELSE 'Rodríguez'
+            END,
+            'usuario' || v_company_id || '@empresa.pe',
+            '99900' || LPAD(v_company_id::TEXT, 4, '0'),
+            v_company_id,
+            v_pri_id,
+            TRUE,
+            TRUE
+        ON CONFLICT (code) DO NOTHING;
+    END LOOP;
+    
+    -- Crear algunos usuarios secundarios
+    INSERT INTO users (code, password, names, last_names, email, phone, company_id, user_type, is_primary, is_active)
+    VALUES 
+        ('U020', '1234', 'Pedro', 'Sánchez', 'pedro@empresa1.pe', '999020020', 1, v_sec_id, FALSE, TRUE),
+        ('U021', '1234', 'Laura', 'Torres', 'laura@empresa1.pe', '999021021', 1, v_sec_id, FALSE, TRUE),
+        ('U022', '1234', 'Diego', 'Ramírez', 'diego@empresa2.pe', '999022022', 2, v_sec_id, FALSE, TRUE),
+        ('U023', '1234', 'Sofía', 'Mendoza', 'sofia@empresa3.pe', '999023023', 3, v_sec_id, FALSE, TRUE)
+    ON CONFLICT (code) DO NOTHING;
+END $$;
+
+-- ======================================================
+-- 11. PLANTAS DE PRUEBA (plants)
+-- ======================================================
+DO $$
+DECLARE
+    v_plant_status BIGINT;
+BEGIN
+    SELECT id INTO v_plant_status FROM types WHERE category = 'plant_status' AND abbr = 'OPE' LIMIT 1;
+    
+    INSERT INTO plants (company_id, code, name, address, latitude, longitude, status)
+    SELECT 
+        c.id,
+        'P' || LPAD(c.id::TEXT, 3, '0'),
+        'Planta ' || c.name,
+        c.address,
+        -12.0464 + (RANDOM() * 5),
+        -77.0428 + (RANDOM() * 5),
+        v_plant_status
+    FROM companies c
+    WHERE c.company_type = (SELECT id FROM types WHERE category = 'company_type' AND abbr = 'OPE' LIMIT 1)
+    ON CONFLICT DO NOTHING;
+END $$;
+
+-- ======================================================
+-- 12. VERIFICACIÓN FINAL
+-- ======================================================
+DO $$
+DECLARE
+    v_types INT;
+    v_companies INT;
+    v_users INT;
+    v_plants INT;
+BEGIN
+    SELECT COUNT(*) INTO v_types FROM types;
+    SELECT COUNT(*) INTO v_companies FROM companies;
+    SELECT COUNT(*) INTO v_users FROM users;
+    SELECT COUNT(*) INTO v_plants FROM plants;
+    
+    RAISE NOTICE '========================================';
+    RAISE NOTICE 'DATOS INICIALES CARGADOS:';
+    RAISE NOTICE '- Tipos (types): %', v_types;
+    RAISE NOTICE '- Empresas (companies): %', v_companies;
+    RAISE NOTICE '- Usuarios (users): %', v_users;
+    RAISE NOTICE '- Plantas (plants): %', v_plants;
+    RAISE NOTICE '========================================';
+    RAISE NOTICE 'Usuario Admin: U001 / 1234';
+    RAISE NOTICE 'Usuarios Principales: U002-U015 / 1234';
+    RAISE NOTICE 'Usuarios Secundarios: U020-U023 / 1234';
+    RAISE NOTICE '========================================';
+END $$;

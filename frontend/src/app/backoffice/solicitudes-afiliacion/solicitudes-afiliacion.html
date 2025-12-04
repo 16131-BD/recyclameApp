@@ -1,0 +1,707 @@
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <div class="page-title-wrapper">
+        <h1 class="page-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          Solicitudes de Afiliación
+        </h1>
+        <p class="page-subtitle">Gestiona las solicitudes de usuarios que desean afiliarse a tu empresa y administra sus permisos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-navigation">
+    <button 
+      class="tab-button" 
+      [class.active]="currentTab() === 'solicitudes'"
+      (click)="setTab('solicitudes')"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      Solicitudes
+      @if (pendingSolicitudes() > 0) {
+        <span class="tab-badge">{{ pendingSolicitudes() }}</span>
+      }
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="currentTab() === 'usuarios'"
+      (click)="setTab('usuarios')"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Usuarios Afiliados
+      <span class="tab-count">{{ totalUsuarios() }}</span>
+    </button>
+  </div>
+
+  <!-- Messages -->
+  @if (successMessage()) {
+    <div class="alert alert-success">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+      <span>{{ successMessage() }}</span>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <!-- TAB: SOLICITUDES -->
+  @if (currentTab() === 'solicitudes') {
+    <!-- Stats Cards -->
+    <div class="stats-mini-grid">
+      <div class="stat-mini-card">
+        <div class="stat-mini-value">{{ totalSolicitudes() }}</div>
+        <div class="stat-mini-label">Total</div>
+      </div>
+      <div class="stat-mini-card warning">
+        <div class="stat-mini-value">{{ pendingSolicitudes() }}</div>
+        <div class="stat-mini-label">Pendientes</div>
+      </div>
+      <div class="stat-mini-card success">
+        <div class="stat-mini-value">{{ approvedSolicitudes() }}</div>
+        <div class="stat-mini-label">Aprobadas</div>
+      </div>
+      <div class="stat-mini-card danger">
+        <div class="stat-mini-value">{{ rejectedSolicitudes() }}</div>
+        <div class="stat-mini-label">Rechazadas</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input 
+          type="text" 
+          placeholder="Buscar por nombre, email o código..." 
+          class="search-input"
+          [value]="searchTerm()"
+          (input)="updateSearch($event)"
+        >
+      </div>
+      <div class="filter-tabs">
+        <button 
+          class="filter-tab" 
+          [class.active]="filterStatus() === 'all'"
+          (click)="setFilter('all')"
+        >
+          Todas
+        </button>
+        <button 
+          class="filter-tab warning" 
+          [class.active]="filterStatus() === 'pending'"
+          (click)="setFilter('pending')"
+        >
+          Pendientes
+          @if (pendingSolicitudes() > 0) {
+            <span class="tab-badge">{{ pendingSolicitudes() }}</span>
+          }
+        </button>
+        <button 
+          class="filter-tab" 
+          [class.active]="filterStatus() === 'approved'"
+          (click)="setFilter('approved')"
+        >
+          Aprobadas
+        </button>
+        <button 
+          class="filter-tab" 
+          [class.active]="filterStatus() === 'rejected'"
+          (click)="setFilter('rejected')"
+        >
+          Rechazadas
+        </button>
+      </div>
+    </div>
+
+    <!-- Data Table Solicitudes -->
+    <div class="data-card">
+      @if (isLoading()) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Cargando solicitudes...</p>
+        </div>
+      } @else if (filteredSolicitudes().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          </div>
+          <h3>No hay solicitudes {{ filterStatus() !== 'all' ? getStatusLabel(filterStatus()).toLowerCase() + 's' : '' }}</h3>
+          <p>{{ searchTerm() ? 'Intenta con otros términos de búsqueda' : 'Las nuevas solicitudes de afiliación aparecerán aquí' }}</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Usuario Solicitante</th>
+                <th>Rol Solicitado</th>
+                <th>Mensaje</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (solicitud of filteredSolicitudes(); track trackBySolicitud($index, solicitud)) {
+                <tr [class.row-pending]="solicitud.status === 'pending'">
+                  <td>
+                    <div class="user-info">
+                      <div class="user-avatar">
+                        {{ (solicitud.applicant_user_name || 'U').charAt(0).toUpperCase() }}
+                      </div>
+                      <div class="user-details">
+                        <div class="cell-main">{{ solicitud.applicant_user_name }}</div>
+                        <div class="cell-sub">{{ solicitud.applicant_user_email }}</div>
+                        <div class="cell-code">{{ solicitud.applicant_user_code }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="role-badge" [class]="getRoleClass(solicitud.requested_role || 'Usuario')">
+                      {{ solicitud.requested_role || 'Usuario' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="message-preview" [title]="solicitud.message || ''">
+                      {{ solicitud.message ? (solicitud.message.length > 50 ? solicitud.message.substring(0, 50) + '...' : solicitud.message) : '-' }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="date-text">{{ formatDate(solicitud.created_at) }}</span>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="solicitud.status">
+                      <span class="status-dot"></span>
+                      {{ getStatusLabel(solicitud.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn-icon view" title="Ver detalles" (click)="openViewModal(solicitud)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                      </button>
+                      @if (solicitud.status === 'pending') {
+                        <button class="btn-icon approve" title="Aprobar y configurar permisos" (click)="approveSolicitud(solicitud)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                        </button>
+                        <button class="btn-icon reject" title="Rechazar" (click)="openRejectModal(solicitud)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span class="results-count">Mostrando {{ filteredSolicitudes().length }} de {{ totalSolicitudes() }} solicitudes</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- TAB: USUARIOS AFILIADOS -->
+  @if (currentTab() === 'usuarios') {
+    <!-- Stats Cards Usuarios -->
+    <div class="stats-mini-grid">
+      <div class="stat-mini-card">
+        <div class="stat-mini-value">{{ totalUsuarios() }}</div>
+        <div class="stat-mini-label">Total Usuarios</div>
+      </div>
+      <div class="stat-mini-card success">
+        <div class="stat-mini-value">{{ activeUsuarios() }}</div>
+        <div class="stat-mini-label">Activos</div>
+      </div>
+      <div class="stat-mini-card danger">
+        <div class="stat-mini-value">{{ totalUsuarios() - activeUsuarios() }}</div>
+        <div class="stat-mini-label">Inactivos</div>
+      </div>
+    </div>
+
+    <!-- Toolbar Usuarios -->
+    <div class="toolbar">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input 
+          type="text" 
+          placeholder="Buscar por nombre, email, código o rol..." 
+          class="search-input"
+          [value]="searchTermUsuarios()"
+          (input)="updateSearchUsuarios($event)"
+        >
+      </div>
+      @if (isAdmin()) {
+        <select class="filter-select" (change)="filterByCompany($event)">
+          <option value="">Todas las empresas</option>
+          @for (empresa of empresasList; track empresa.id) {
+            <option [value]="empresa.id">{{ empresa.name }}</option>
+          }
+        </select>
+      }
+    </div>
+
+    <!-- Data Table Usuarios -->
+    <div class="data-card">
+      @if (filteredUsuarios().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>No hay usuarios afiliados</h3>
+          <p>{{ searchTermUsuarios() ? 'Intenta con otros términos de búsqueda' : 'Los usuarios aprobados aparecerán aquí' }}</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                @if (isAdmin()) {
+                  <th>Empresa</th>
+                }
+                <th>Rol</th>
+                <th>Módulos</th>
+                <th>Permisos Especiales</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (usuario of filteredUsuarios(); track trackByUsuario($index, usuario)) {
+                <tr [class.row-inactive]="!usuario.is_active">
+                  <td>
+                    <div class="user-info">
+                      <div class="user-avatar" [class.primary]="usuario.is_primary">
+                        {{ (usuario.user_name || 'U').charAt(0).toUpperCase() }}
+                        @if (usuario.is_primary) {
+                          <span class="primary-badge" title="Usuario Principal">★</span>
+                        }
+                      </div>
+                      <div class="user-details">
+                        <div class="cell-main">
+                          {{ usuario.user_name }}
+                          @if (usuario.is_primary) {
+                            <span class="primary-tag">Principal</span>
+                          }
+                        </div>
+                        <div class="cell-sub">{{ usuario.user_email }}</div>
+                        <div class="cell-code">{{ usuario.user_code }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  @if (isAdmin()) {
+                    <td>
+                      <span class="company-badge">{{ usuario.company_name || getEmpresaNombre(usuario.company_id) }}</span>
+                    </td>
+                  }
+                  <td>
+                    <span class="role-badge" [class]="getRoleClass(usuario.role)">
+                      {{ usuario.role }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="modules-summary">
+                      <span class="modules-count">{{ countActiveModules(usuario.modules) }}/{{ modulesList.length }}</span>
+                      <span class="modules-label">módulos</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="permissions-badges">
+                      @if (usuario.restrictions?.can_approve_affiliations) {
+                        <span class="permission-badge approve">Aprobar</span>
+                      }
+                      @if (usuario.restrictions?.can_manage_permissions) {
+                        <span class="permission-badge manage">Permisos</span>
+                      }
+                      @if (!usuario.restrictions?.can_approve_affiliations && !usuario.restrictions?.can_manage_permissions) {
+                        <span class="permission-badge none">Básico</span>
+                      }
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="usuario.is_active ? 'active' : 'inactive'">
+                      <span class="status-dot"></span>
+                      {{ usuario.is_active ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn-icon settings" title="Configurar permisos" (click)="openPermissionsModal(usuario)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                      </button>
+                      @if (!usuario.is_primary) {
+                        <button 
+                          class="btn-icon" 
+                          [class.deactivate]="usuario.is_active"
+                          [class.activate]="!usuario.is_active"
+                          [title]="usuario.is_active ? 'Desactivar usuario' : 'Activar usuario'"
+                          (click)="toggleUsuarioActive(usuario)"
+                        >
+                          @if (usuario.is_active) {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
+                          } @else {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                          }
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span class="results-count">Mostrando {{ filteredUsuarios().length }} de {{ totalUsuarios() }} usuarios</span>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- View Modal (Solicitud Details) -->
+@if (modalMode() === 'view' && selectedSolicitud()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal modal-medium" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <h2 class="modal-title">Detalles de la Solicitud</h2>
+          <span class="status-badge large" [class]="selectedSolicitud()!.status">
+            <span class="status-dot"></span>
+            {{ getStatusLabel(selectedSolicitud()!.status) }}
+          </span>
+        </div>
+        <button class="modal-close" (click)="closeModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- User Info Section -->
+        <div class="info-section">
+          <h3 class="section-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Datos del Solicitante
+          </h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Nombre Completo</label>
+              <span class="value-highlight">{{ selectedSolicitud()!.applicant_user_name }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Código de Usuario</label>
+              <span class="code-badge">{{ selectedSolicitud()!.applicant_user_code }}</span>
+            </div>
+            <div class="detail-item full-width">
+              <label>Email</label>
+              <span>{{ selectedSolicitud()!.applicant_user_email }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Rol Solicitado</label>
+              <span class="role-badge" [class]="getRoleClass(selectedSolicitud()!.requested_role || 'Usuario')">
+                {{ selectedSolicitud()!.requested_role || 'Usuario' }}
+              </span>
+            </div>
+            <div class="detail-item">
+              <label>Empresa</label>
+              <span>{{ selectedSolicitud()!.company_name }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message Section -->
+        @if (selectedSolicitud()!.message) {
+          <div class="info-section">
+            <h3 class="section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Mensaje del Solicitante
+            </h3>
+            <div class="message-box">
+              {{ selectedSolicitud()!.message }}
+            </div>
+          </div>
+        }
+
+        <!-- Rejection Reason (if rejected) -->
+        @if (selectedSolicitud()!.status === 'rejected' && selectedSolicitud()!.rejection_reason) {
+          <div class="info-section rejection-section">
+            <h3 class="section-title danger">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+              Motivo de Rechazo
+            </h3>
+            <div class="rejection-box">
+              {{ selectedSolicitud()!.rejection_reason }}
+            </div>
+          </div>
+        }
+
+        <!-- Metadata -->
+        <div class="metadata-section">
+          <span class="metadata-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            Solicitud recibida: {{ formatDateTime(selectedSolicitud()!.created_at) }}
+          </span>
+          @if (selectedSolicitud()!.approved_at) {
+            <span class="metadata-item success">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+              Aprobada: {{ formatDateTime(selectedSolicitud()!.approved_at) }}
+            </span>
+          }
+          @if (selectedSolicitud()!.rejected_at) {
+            <span class="metadata-item danger">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+              Rechazada: {{ formatDateTime(selectedSolicitud()!.rejected_at) }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
+        @if (selectedSolicitud()!.status === 'pending') {
+          <button class="btn btn-danger" (click)="openRejectModal(selectedSolicitud()!)" [disabled]="isProcessing()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+            Rechazar
+          </button>
+          <button class="btn btn-success" (click)="approveSolicitud(selectedSolicitud()!)" [disabled]="isProcessing()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+            Aprobar y Configurar Permisos
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Reject Modal -->
+@if (modalMode() === 'reject' && selectedSolicitud()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal modal-small" (click)="$event.stopPropagation()">
+      <div class="modal-header danger">
+        <h2 class="modal-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+          Rechazar Solicitud
+        </h2>
+        <button class="modal-close" (click)="closeModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="reject-info">
+          Estás por rechazar la solicitud de afiliación de <strong>{{ selectedSolicitud()!.applicant_user_name }}</strong>.
+          Por favor, indica el motivo del rechazo.
+        </p>
+
+        @if (errorMessage()) {
+          <div class="alert alert-error mb-4">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <div class="form-group">
+          <label for="rejectionReason">Motivo del rechazo <span class="required">*</span></label>
+          <textarea 
+            id="rejectionReason"
+            [(ngModel)]="rejectionReason"
+            placeholder="Explique el motivo por el cual se rechaza esta solicitud..."
+            rows="4"
+            class="form-control"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn btn-danger" (click)="rejectSolicitud()" [disabled]="isProcessing()">
+          @if (isProcessing()) {
+            <span class="btn-spinner"></span>
+            Procesando...
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+            Confirmar Rechazo
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Permissions Modal -->
+@if (modalMode() === 'permissions') {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header primary">
+        <h2 class="modal-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          @if (selectedSolicitud()) {
+            Configurar Permisos - {{ selectedSolicitud()!.applicant_user_name }}
+          } @else if (selectedUsuario()) {
+            Editar Permisos - {{ selectedUsuario()!.user_name }}
+          }
+        </h2>
+        <button class="modal-close" (click)="closeModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        @if (selectedSolicitud()) {
+          <div class="approval-notice">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <p>Configure los permisos que tendrá el usuario <strong>{{ selectedSolicitud()!.applicant_user_name }}</strong> una vez aprobada su solicitud.</p>
+          </div>
+        }
+
+        <!-- Modules Section -->
+        <div class="permissions-section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+              Módulos del Sistema
+            </h3>
+            <div class="toggle-all">
+              <button class="btn btn-sm btn-outline" (click)="toggleAllModules(true)">Activar Todos</button>
+              <button class="btn btn-sm btn-outline" (click)="toggleAllModules(false)">Desactivar Todos</button>
+            </div>
+          </div>
+          <p class="section-description">Seleccione los módulos a los que el usuario tendrá acceso en el menú de navegación.</p>
+          
+          <div class="modules-grid">
+            @for (module of modulesList; track trackByModule($index, module)) {
+              <label class="module-toggle" [class.active]="isModuleActive(module.key)">
+                <input 
+                  type="checkbox" 
+                  [checked]="isModuleActive(module.key)"
+                  (change)="toggleModule(module.key)"
+                >
+                <div class="toggle-content">
+                  <span class="toggle-icon">
+                    @switch (module.icon) {
+                      @case ('dashboard') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                      }
+                      @case ('building') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>
+                      }
+                      @case ('users') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                      }
+                      @case ('recycle') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/><path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/><path d="m14 16-3 3 3 3"/><path d="M8.293 13.596 7.196 9.5 3.1 10.598"/><path d="m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.943 6.843"/><path d="m13.378 9.633 4.096 1.098 1.097-4.096"/></svg>
+                      }
+                      @case ('factory') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+                      }
+                      @case ('clipboard') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+                      }
+                      @case ('user-plus') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                      }
+                      @case ('building-plus') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><line x1="10" y1="9" x2="14" y2="9"/><line x1="12" y1="7" x2="12" y2="11"/></svg>
+                      }
+                      @case ('settings') {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                      }
+                    }
+                  </span>
+                  <span class="toggle-label">{{ module.label }}</span>
+                  <span class="toggle-check">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  </span>
+                </div>
+              </label>
+            }
+          </div>
+          
+          <div class="modules-summary-bar">
+            <span>{{ getActiveModulesCount() }} de {{ modulesList.length }} módulos seleccionados</span>
+          </div>
+        </div>
+
+        <!-- Special Restrictions Section -->
+        <div class="permissions-section">
+          <h3 class="section-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+            Permisos Especiales
+          </h3>
+          <p class="section-description">Otorgue permisos administrativos adicionales al usuario.</p>
+          
+          <div class="restrictions-grid">
+            <label class="restriction-toggle" [class.active]="tempRestrictions.can_approve_affiliations">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="tempRestrictions.can_approve_affiliations"
+              >
+              <div class="restriction-content">
+                <div class="restriction-info">
+                  <span class="restriction-title">Aprobar Solicitudes de Afiliación</span>
+                  <span class="restriction-description">Permite aprobar o rechazar solicitudes de otros usuarios</span>
+                </div>
+                <div class="restriction-switch">
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </div>
+              </div>
+            </label>
+            
+            <label class="restriction-toggle" [class.active]="tempRestrictions.can_manage_permissions">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="tempRestrictions.can_manage_permissions"
+              >
+              <div class="restriction-content">
+                <div class="restriction-info">
+                  <span class="restriction-title">Gestionar Permisos de Usuarios</span>
+                  <span class="restriction-description">Permite modificar los permisos de otros usuarios afiliados</span>
+                </div>
+                <div class="restriction-switch">
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        @if (selectedSolicitud()) {
+          <button class="btn btn-success" (click)="confirmApproval()" [disabled]="isProcessing()">
+            @if (isProcessing()) {
+              <span class="btn-spinner"></span>
+              Procesando...
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+              Aprobar y Guardar Permisos
+            }
+          </button>
+        } @else {
+          <button class="btn btn-primary" (click)="saveUserPermissions()" [disabled]="isProcessing()">
+            @if (isProcessing()) {
+              <span class="btn-spinner"></span>
+              Guardando...
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Guardar Cambios
+            }
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

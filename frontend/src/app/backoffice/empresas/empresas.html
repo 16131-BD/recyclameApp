@@ -132,7 +132,9 @@
                   }
                 </td>
                 <td>
-                  <span class="type-badge">{{ getCompanyTypeLabel(empresa.company_type_code) }}</span>
+                  <span class="type-badge" [ngClass]="getCompanyTypeBadgeClass(empresa.company_type_abbr)">
+                    {{ getCompanyTypeLabel(empresa.company_type_abbr) }}
+                  </span>
                 </td>
                 <td>{{ empresa.ruc || '-' }}</td>
                 <td>
@@ -212,7 +214,9 @@
             </div>
             <div class="detail-item">
               <label>Tipo de Empresa</label>
-              <span>{{ getCompanyTypeLabel(selectedEmpresa()!.company_type_code) }}</span>
+              <span class="type-badge" [ngClass]="getCompanyTypeBadgeClass(selectedEmpresa()!.company_type_abbr)">
+                {{ getCompanyTypeLabel(selectedEmpresa()!.company_type_abbr) }}
+              </span>
             </div>
             <div class="detail-item">
               <label>RUC</label>

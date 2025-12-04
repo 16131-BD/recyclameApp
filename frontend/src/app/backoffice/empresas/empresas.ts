@@ -7,7 +7,8 @@ interface Empresa {
   id: number;
   code: string;
   name: string;
-  company_type_code?: string;
+  company_type?: number;
+  company_type_abbr?: string;
   company_type_name?: string;
   ruc?: string;
   address?: string;
@@ -15,7 +16,16 @@ interface Empresa {
   email?: string;
   contact_name?: string;
   is_active: boolean;
+  primary_user_id?: number;
+  primary_user_name?: string;
+  total_users?: number;
   created_at?: string;
+}
+
+interface TipoEmpresa {
+  id: number;
+  abbr: string;
+  name: string;
 }
 
 type ModalMode = 'create' | 'edit' | 'view' | null;
@@ -32,6 +42,7 @@ export class Empresas implements OnInit {
   isLoading = signal(true);
   isSaving = signal(false);
   empresas = signal<Empresa[]>([]);
+  tiposEmpresa = signal<TipoEmpresa[]>([]);
   modalMode = signal<ModalMode>(null);
   selectedEmpresa = signal<Empresa | null>(null);
   searchTerm = signal('');
@@ -76,6 +87,7 @@ export class Empresas implements OnInit {
 
   ngOnInit(): void {
     this.loadEmpresas();
+    this.loadTiposEmpresa();
   }
 
   loadEmpresas(): void {
@@ -91,6 +103,19 @@ export class Empresas implements OnInit {
         console.error('Error loading companies:', error);
         this.showError('Error al cargar las empresas');
         this.isLoading.set(false);
+      }
+    });
+  }
+
+  loadTiposEmpresa(): void {
+    this.mainService.getTypesByCategory('company_type').subscribe({
+      next: (response) => {
+        if (response.data) {
+          this.tiposEmpresa.set(response.data);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading company types:', error);
       }
     });
   }
@@ -221,13 +246,24 @@ export class Empresas implements OnInit {
     this.errorMessage.set('');
   }
 
-  getCompanyTypeLabel(type?: string): string {
+  getCompanyTypeLabel(abbr?: string): string {
+    if (!abbr) {
+      return 'No definido';
+    }
+    // Solo mostrar Generador y Operador
     const types: { [key: string]: string } = {
-      'GEN': 'Generadora',
-      'TRA': 'Transportista',
-      'TRE': 'Tratadora',
-      'REC': 'Recicladora'
+      'GEN': 'Generador',
+      'OPE': 'Operador'
     };
-    return type ? types[type] || type : 'No definido';
+    return types[abbr] || abbr;
+  }
+
+  getCompanyTypeBadgeClass(abbr?: string): string {
+    if (!abbr) return 'type-badge-default';
+    switch (abbr) {
+      case 'GEN': return 'type-badge-gen';
+      case 'OPE': return 'type-badge-ope';
+      default: return 'type-badge-default';
+    }
   }
 }

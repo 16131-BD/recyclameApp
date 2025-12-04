@@ -5,13 +5,13 @@
       <div class="page-title-wrapper">
         <h1 class="page-title">
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
-          Gestión de Operaciones
+          Operaciones Autorizadas
         </h1>
-        <p class="page-subtitle">Administra las operaciones de reciclaje registradas en el sistema</p>
+        <p class="page-subtitle">Administra los tipos de operaciones autorizadas en el sistema</p>
       </div>
       <button class="btn btn-primary" (click)="openCreateModal()">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-        Nueva Operación
+        Nueva Operacion
       </button>
     </div>
   </div>
@@ -29,22 +29,8 @@
       <div class="stat-mini-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
       </div>
-      <div class="stat-mini-value">{{ completedOperaciones() }}</div>
-      <div class="stat-mini-label">Completadas</div>
-    </div>
-    <div class="stat-mini-card pending">
-      <div class="stat-mini-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      </div>
-      <div class="stat-mini-value">{{ pendingOperaciones() }}</div>
-      <div class="stat-mini-label">Pendientes</div>
-    </div>
-    <div class="stat-mini-card in-progress">
-      <div class="stat-mini-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>
-      </div>
-      <div class="stat-mini-value">{{ inProgressOperaciones() }}</div>
-      <div class="stat-mini-label">En Proceso</div>
+      <div class="stat-mini-value">{{ activeOperaciones() }}</div>
+      <div class="stat-mini-label">Activas</div>
     </div>
   </div>
 
@@ -52,50 +38,7 @@
   <div class="toolbar">
     <div class="search-box">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input 
-        type="text" 
-        placeholder="Buscar por código o residuo..." 
-        class="search-input"
-        [value]="searchTerm()"
-        (input)="updateSearch($event)"
-      >
-    </div>
-    <div class="filter-tabs">
-      <button 
-        class="filter-tab" 
-        [class.active]="filterStatus() === 'all'"
-        (click)="setFilter('all')"
-      >
-        Todas
-      </button>
-      <button 
-        class="filter-tab" 
-        [class.active]="filterStatus() === 'Pendiente'"
-        (click)="setFilter('Pendiente')"
-      >
-        Pendientes
-      </button>
-      <button 
-        class="filter-tab" 
-        [class.active]="filterStatus() === 'En Proceso'"
-        (click)="setFilter('En Proceso')"
-      >
-        En Proceso
-      </button>
-      <button 
-        class="filter-tab" 
-        [class.active]="filterStatus() === 'Completada'"
-        (click)="setFilter('Completada')"
-      >
-        Completadas
-      </button>
-      <button 
-        class="filter-tab" 
-        [class.active]="filterStatus() === 'Cancelada'"
-        (click)="setFilter('Cancelada')"
-      >
-        Canceladas
-      </button>
+      <input type="text" placeholder="Buscar por codigo o nombre..." class="search-input" [value]="searchTerm()" (input)="updateSearch($event)">
     </div>
   </div>
 
@@ -106,7 +49,6 @@
       {{ successMessage() }}
     </div>
   }
-
   @if (errorMessage()) {
     <div class="alert alert-error">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
@@ -119,7 +61,7 @@
     @if (isLoading()) {
       <div class="loading-state">
         <div class="spinner"></div>
-        <p>Cargando operaciones...</p>
+        <p>Cargando operaciones autorizadas...</p>
       </div>
     } @else if (filteredOperaciones().length === 0) {
       <div class="empty-state">
@@ -127,11 +69,11 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/></svg>
         </div>
         <h3>No se encontraron operaciones</h3>
-        <p>{{ searchTerm() ? 'Intenta con otros términos de búsqueda' : 'Comienza agregando una nueva operación' }}</p>
+        <p>{{ searchTerm() ? 'Intenta con otros terminos de busqueda' : 'Comienza agregando una nueva operacion autorizada' }}</p>
         @if (!searchTerm()) {
           <button class="btn btn-primary" (click)="openCreateModal()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-            Agregar Operación
+            Agregar Operacion
           </button>
         }
       </div>
@@ -140,50 +82,25 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th>Código</th>
-              <th>Tipo</th>
-              <th>Residuo</th>
-              <th>Origen</th>
-              <th>Destino</th>
-              <th>Cantidad</th>
-              <th>Fecha</th>
-              <th>Estado</th>
-              <th class="text-center">Acciones</th>
+              <th style="width: 80px;">Orden</th>
+              <th style="width: 100px;">Codigo</th>
+              <th>Nombre</th>
+              <th>Descripcion</th>
+              <th style="width: 100px;">Estado</th>
+              <th class="text-center" style="width: 120px;">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            @for (operacion of filteredOperaciones(); track operacion.id) {
+            @for (operacion of filteredOperaciones(); track operacion._id || operacion.code) {
               <tr>
+                <td><span class="order-badge">{{ operacion.order }}</span></td>
+                <td><span class="code-badge">{{ operacion.code }}</span></td>
+                <td><div class="cell-main">{{ operacion.name }}</div></td>
+                <td><div class="cell-description">{{ operacion.description || '-' }}</div></td>
                 <td>
-                  <span class="code-badge">{{ operacion.code }}</span>
-                </td>
-                <td>
-                  <span class="type-badge">{{ operacion.operation_type_name || operacion.operation_type_code || '-' }}</span>
-                </td>
-                <td>
-                  <div class="cell-main">{{ operacion.residue_name || '-' }}</div>
-                  @if (operacion.residue_code) {
-                    <div class="cell-sub">{{ operacion.residue_code }}</div>
-                  }
-                </td>
-                <td>
-                  <div class="cell-main">{{ operacion.source_plant_name || '-' }}</div>
-                  @if (operacion.source_plant_code) {
-                    <div class="cell-sub">{{ operacion.source_plant_code }}</div>
-                  }
-                </td>
-                <td>
-                  <div class="cell-main">{{ operacion.destination_plant_name || '-' }}</div>
-                  @if (operacion.destination_plant_code) {
-                    <div class="cell-sub">{{ operacion.destination_plant_code }}</div>
-                  }
-                </td>
-                <td>{{ formatQuantity(operacion.quantity, operacion.unit) }}</td>
-                <td>{{ formatDate(operacion.operation_date) }}</td>
-                <td>
-                  <span class="status-badge" [class]="getStatusClass(operacion.status)">
+                  <span class="status-badge" [class.active]="operacion.is_active" [class.inactive]="!operacion.is_active">
                     <span class="status-dot"></span>
-                    {{ operacion.status || 'Sin estado' }}
+                    {{ operacion.is_active ? 'Activo' : 'Inactivo' }}
                   </span>
                 </td>
                 <td>
@@ -218,251 +135,53 @@
 <!-- Modal -->
 @if (modalMode()) {
   <div class="modal-overlay" (click)="closeModal()">
-    <div class="modal modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2 class="modal-title">
           @switch (modalMode()) {
-            @case ('create') { Nueva Operación }
-            @case ('edit') { Editar Operación }
-            @case ('view') { Detalles de Operación }
+            @case ('create') { Nueva Operacion Autorizada }
+            @case ('edit') { Editar Operacion Autorizada }
+            @case ('view') { Detalles de Operacion }
           }
         </h2>
         <button class="modal-close" (click)="closeModal()">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
-
       <div class="modal-body">
         @if (modalMode() === 'view' && selectedOperacion()) {
-          <!-- View Mode -->
           <div class="detail-grid">
-            <div class="detail-item">
-              <label>Código</label>
-              <span class="code-badge large">{{ selectedOperacion()!.code }}</span>
-            </div>
-            <div class="detail-item">
-              <label>Tipo de Operación</label>
-              <span>{{ selectedOperacion()!.operation_type_name || selectedOperacion()!.operation_type_code || '-' }}</span>
-            </div>
-            <div class="detail-item">
-              <label>Residuo</label>
-              <span>{{ selectedOperacion()!.residue_name || '-' }}</span>
-            </div>
-            <div class="detail-item">
-              <label>Código Residuo</label>
-              <span>{{ selectedOperacion()!.residue_code || '-' }}</span>
-            </div>
-            <div class="detail-item">
-              <label>Planta Origen</label>
-              <span>{{ selectedOperacion()!.source_plant_name || '-' }}</span>
-            </div>
-            <div class="detail-item">
-              <label>Planta Destino</label>
-              <span>{{ selectedOperacion()!.destination_plant_name || '-' }}</span>
-            </div>
-            <div class="detail-item">
-              <label>Cantidad</label>
-              <span>{{ formatQuantity(selectedOperacion()!.quantity, selectedOperacion()!.unit) }}</span>
-            </div>
-            <div class="detail-item">
-              <label>Fecha de Operación</label>
-              <span>{{ formatDate(selectedOperacion()!.operation_date) }}</span>
-            </div>
-            <div class="detail-item">
-              <label>Estado</label>
-              <span class="status-badge" [class]="getStatusClass(selectedOperacion()!.status)">
-                <span class="status-dot"></span>
-                {{ selectedOperacion()!.status || 'Sin estado' }}
-              </span>
-            </div>
-            <div class="detail-item">
-              <label>Activo</label>
-              <span class="status-badge" [class.active]="selectedOperacion()!.is_active" [class.inactive]="!selectedOperacion()!.is_active">
-                <span class="status-dot"></span>
-                {{ selectedOperacion()!.is_active ? 'Sí' : 'No' }}
-              </span>
-            </div>
-            <div class="detail-item full-width">
-              <label>Notas</label>
-              <span>{{ selectedOperacion()!.notes || '-' }}</span>
-            </div>
+            <div class="detail-item"><label>Orden</label><span class="order-badge large">{{ selectedOperacion()!.order }}</span></div>
+            <div class="detail-item"><label>Codigo</label><span class="code-badge large">{{ selectedOperacion()!.code }}</span></div>
+            <div class="detail-item full-width"><label>Nombre</label><span>{{ selectedOperacion()!.name }}</span></div>
+            <div class="detail-item full-width"><label>Descripcion</label><span>{{ selectedOperacion()!.description || '-' }}</span></div>
+            <div class="detail-item"><label>Estado</label><span class="status-badge" [class.active]="selectedOperacion()!.is_active" [class.inactive]="!selectedOperacion()!.is_active"><span class="status-dot"></span>{{ selectedOperacion()!.is_active ? 'Activo' : 'Inactivo' }}</span></div>
+            <div class="detail-item"><label>Fecha de Creacion</label><span>{{ formatDate(selectedOperacion()!.created_at) }}</span></div>
           </div>
         } @else {
-          <!-- Create/Edit Mode -->
           @if (errorMessage()) {
-            <div class="alert alert-error mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
-              {{ errorMessage() }}
-            </div>
+            <div class="alert alert-error mb-4">{{ errorMessage() }}</div>
           }
-
           @if (successMessage()) {
-            <div class="alert alert-success mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-              {{ successMessage() }}
-            </div>
+            <div class="alert alert-success mb-4">{{ successMessage() }}</div>
           }
-
           <form class="form-grid" (ngSubmit)="saveOperacion()">
-            <div class="form-group">
-              <label for="code">Código <span class="required">*</span></label>
-              <input 
-                type="text" 
-                id="code" 
-                [(ngModel)]="formData.code" 
-                name="code"
-                placeholder="Ej: OP001"
-                [disabled]="modalMode() === 'edit'"
-                class="form-control"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="operation_type_code">Código Tipo Operación</label>
-              <input 
-                type="text" 
-                id="operation_type_code" 
-                [(ngModel)]="formData.operation_type_code" 
-                name="operation_type_code"
-                placeholder="Código del tipo"
-                class="form-control"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="residue_code">Código Residuo</label>
-              <input 
-                type="text" 
-                id="residue_code" 
-                [(ngModel)]="formData.residue_code" 
-                name="residue_code"
-                placeholder="Código del residuo"
-                class="form-control"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="source_plant_code">Código Planta Origen</label>
-              <input 
-                type="text" 
-                id="source_plant_code" 
-                [(ngModel)]="formData.source_plant_code" 
-                name="source_plant_code"
-                placeholder="Código planta origen"
-                class="form-control"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="destination_plant_code">Código Planta Destino</label>
-              <input 
-                type="text" 
-                id="destination_plant_code" 
-                [(ngModel)]="formData.destination_plant_code" 
-                name="destination_plant_code"
-                placeholder="Código planta destino"
-                class="form-control"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="quantity">Cantidad</label>
-              <input 
-                type="number" 
-                id="quantity" 
-                [(ngModel)]="formData.quantity" 
-                name="quantity"
-                placeholder="0"
-                class="form-control"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="unit">Unidad</label>
-              <select 
-                id="unit" 
-                [(ngModel)]="formData.unit" 
-                name="unit"
-                class="form-control"
-              >
-                <option value="kg">Kilogramos (kg)</option>
-                <option value="ton">Toneladas (ton)</option>
-                <option value="lt">Litros (lt)</option>
-                <option value="m3">Metros cúbicos (m³)</option>
-                <option value="und">Unidades (und)</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="operation_date">Fecha de Operación</label>
-              <input 
-                type="date" 
-                id="operation_date" 
-                [(ngModel)]="formData.operation_date" 
-                name="operation_date"
-                class="form-control"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="status">Estado</label>
-              <select 
-                id="status" 
-                [(ngModel)]="formData.status" 
-                name="status"
-                class="form-control"
-              >
-                @for (status of statusOptions; track status) {
-                  <option [value]="status">{{ status }}</option>
-                }
-              </select>
-            </div>
-
-            <div class="form-group full-width">
-              <label for="notes">Notas</label>
-              <textarea 
-                id="notes" 
-                [(ngModel)]="formData.notes" 
-                name="notes"
-                placeholder="Observaciones adicionales..."
-                class="form-control"
-                rows="3"
-              ></textarea>
-            </div>
-
-            <div class="form-group">
-              <label class="toggle-label">
-                <input 
-                  type="checkbox" 
-                  [(ngModel)]="formData.is_active" 
-                  name="is_active"
-                  class="toggle-input"
-                >
-                <span class="toggle-switch"></span>
-                <span class="toggle-text">Operación activa</span>
-              </label>
-            </div>
+            <div class="form-group"><label for="order">Orden <span class="required">*</span></label><input type="number" id="order" [(ngModel)]="formData.order" name="order" placeholder="1" min="1" class="form-control"></div>
+            <div class="form-group"><label for="code">Codigo <span class="required">*</span></label><input type="text" id="code" [(ngModel)]="formData.code" name="code" placeholder="Ej: REC" [disabled]="modalMode() === 'edit'" class="form-control" style="text-transform: uppercase;"></div>
+            <div class="form-group full-width"><label for="name">Nombre <span class="required">*</span></label><input type="text" id="name" [(ngModel)]="formData.name" name="name" placeholder="Ej: Recoleccion y transporte" class="form-control"></div>
+            <div class="form-group full-width"><label for="description">Descripcion</label><textarea id="description" [(ngModel)]="formData.description" name="description" placeholder="Descripcion de la operacion..." class="form-control" rows="3"></textarea></div>
+            <div class="form-group"><label class="toggle-label"><input type="checkbox" [(ngModel)]="formData.is_active" name="is_active" class="toggle-input"><span class="toggle-switch"></span><span class="toggle-text">Operacion activa</span></label></div>
           </form>
         }
       </div>
-
       <div class="modal-footer">
         @if (modalMode() === 'view') {
           <button class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
-          <button class="btn btn-primary" (click)="openEditModal(selectedOperacion()!)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-            Editar
-          </button>
+          <button class="btn btn-primary" (click)="openEditModal(selectedOperacion()!)">Editar</button>
         } @else {
           <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
           <button class="btn btn-primary" (click)="saveOperacion()" [disabled]="isSaving()">
-            @if (isSaving()) {
-              <span class="btn-spinner"></span>
-              Guardando...
-            } @else {
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              {{ modalMode() === 'create' ? 'Crear Operación' : 'Guardar Cambios' }}
-            }
+            @if (isSaving()) { Guardando... } @else { {{ modalMode() === 'create' ? 'Crear Operacion' : 'Guardar Cambios' }} }
           </button>
         }
       </div>
