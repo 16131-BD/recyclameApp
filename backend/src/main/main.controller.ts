@@ -41,6 +41,24 @@ class LoginDto {
   filter: any;
 }
 
+// DTO para aprobar afiliación
+class ApproveAffiliationDto {
+  affiliationRequestId: string;  // ID de MongoDB de la solicitud
+  names: string;
+  last_names: string;
+  email: string;
+  phone?: string;
+  company_id: number;
+  password?: string;
+  modules?: any;
+}
+
+// DTO para establecer usuario principal
+class SetPrimaryUserDto {
+  userId: number;
+  companyId: number;
+}
+
 @Controller()
 export class MainController {
   constructor(private readonly mainService: MainService) {}
@@ -86,24 +104,19 @@ export class MainController {
     return this.mainService.createEntities(params.entity, body.news, req.method);
   }
 
-  // @Post('upload-file/:filetype')
-  // @UseGuards(AuthGuard)
-  // @UseInterceptors(FileInterceptor('file', {
-  //   storage: diskStorage({
-  //     destination: './files',
-  //     filename: (req, file, cb) => {
-  //       const fileType = (req.params as FileTypeDto).filetype;
-  //       const randomName = Array(32).fill(null).map(() => Math.round(Math.random() * 16).toString(16)).join('');
-  //       cb(null, `${fileType}-${Date.now()}-${randomName}${extname(file.originalname)}`);
-  //     },
-  //   }),
-  // }))
-  // async uploadFile(
-  //   @Param() params: FileTypeDto,
-  //   @UploadedFile() file: Express.Multer.File
-  // ) {
-  //   return this.mainService.uploadFile(file);
-  // }
+  // Endpoint especial para crear usuario desde aprobación de afiliación
+  @Post('affiliation/approve')
+  @UseGuards(AuthGuard)
+  async approveAffiliation(@Body() body: ApproveAffiliationDto) {
+    return this.mainService.approveAffiliation(body);
+  }
+
+  // Endpoint especial para establecer usuario principal
+  @Post('users/set-primary')
+  @UseGuards(AuthGuard)
+  async setUserAsPrimary(@Body() body: SetPrimaryUserDto) {
+    return this.mainService.setUserAsPrimary(body.userId, body.companyId);
+  }
 
   @Post('login')
   async login(@Body() body: LoginDto) {

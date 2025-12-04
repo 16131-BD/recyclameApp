@@ -26,6 +26,10 @@
       <div class="stat-mini-value">{{ activeUsuarios() }}</div>
       <div class="stat-mini-label">Activos</div>
     </div>
+    <div class="stat-mini-card primary">
+      <div class="stat-mini-value">{{ primaryUsuarios() }}</div>
+      <div class="stat-mini-label">Principales</div>
+    </div>
     <div class="stat-mini-card danger">
       <div class="stat-mini-value">{{ inactiveUsuarios() }}</div>
       <div class="stat-mini-label">Inactivos</div>
@@ -38,34 +42,58 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <input 
         type="text" 
-        placeholder="Buscar por nombre, código o email..." 
+        placeholder="Buscar por nombre, código, email o empresa..." 
         class="search-input"
         [value]="searchTerm()"
         (input)="updateSearch($event)"
       >
     </div>
-    <div class="filter-tabs">
-      <button 
-        class="filter-tab" 
-        [class.active]="filterActive() === 'all'"
-        (click)="setFilter('all')"
-      >
-        Todos
-      </button>
-      <button 
-        class="filter-tab" 
-        [class.active]="filterActive() === 'active'"
-        (click)="setFilter('active')"
-      >
-        Activos
-      </button>
-      <button 
-        class="filter-tab" 
-        [class.active]="filterActive() === 'inactive'"
-        (click)="setFilter('inactive')"
-      >
-        Inactivos
-      </button>
+    
+    <div class="filter-section">
+      <div class="filter-tabs">
+        <button 
+          class="filter-tab" 
+          [class.active]="filterType() === 'all'"
+          (click)="setFilter('all')"
+        >
+          Todos
+        </button>
+        <button 
+          class="filter-tab" 
+          [class.active]="filterType() === 'active'"
+          (click)="setFilter('active')"
+        >
+          Activos
+        </button>
+        <button 
+          class="filter-tab" 
+          [class.active]="filterType() === 'primary'"
+          (click)="setFilter('primary')"
+        >
+          Principales
+        </button>
+        <button 
+          class="filter-tab" 
+          [class.active]="filterType() === 'secondary'"
+          (click)="setFilter('secondary')"
+        >
+          Secundarios
+        </button>
+        <button 
+          class="filter-tab" 
+          [class.active]="filterType() === 'admin'"
+          (click)="setFilter('admin')"
+        >
+          Admins
+        </button>
+      </div>
+      
+      <select class="filter-select" (change)="setEmpresaFilter($event)">
+        <option value="">Todas las empresas</option>
+        @for (empresa of empresas(); track empresa.id) {
+          <option [value]="empresa.id">{{ empresa.name }}</option>
+        }
+      </select>
     </div>
   </div>
 
@@ -113,7 +141,7 @@
               <th>Código</th>
               <th>Nombre</th>
               <th>Email</th>
-              <th>Rol</th>
+              <th>Tipo</th>
               <th>Empresa</th>
               <th>Estado</th>
               <th class="text-center">Acciones</th>
@@ -126,23 +154,29 @@
                   <span class="code-badge">{{ usuario.code }}</span>
                 </td>
                 <td>
-                  <div class="cell-main">{{ usuario.name }}</div>
+                  <div class="user-cell">
+                    <div class="cell-main">{{ usuario.name }}</div>
+                    @if (usuario.is_primary) {
+                      <span class="badge badge-primary-user">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Principal
+                      </span>
+                    }
+                  </div>
                 </td>
                 <td>
                   <div class="cell-email">{{ usuario.email }}</div>
-                </td>
-                <td>
-                  <span class="role-badge">{{ getRoleLabel(usuario.role_code) }}</span>
-                </td>
-                <td>
-                  @if (usuario.company_name) {
-                    <div class="cell-main">{{ usuario.company_name }}</div>
-                    @if (usuario.company_code) {
-                      <div class="cell-sub">{{ usuario.company_code }}</div>
-                    }
-                  } @else {
-                    <span class="text-muted">-</span>
+                  @if (usuario.phone) {
+                    <div class="cell-sub">{{ usuario.phone }}</div>
                   }
+                </td>
+                <td>
+                  <span class="role-badge" [ngClass]="getTipoUsuarioBadgeClass(usuario.user_type)">
+                    {{ getTipoUsuarioNombre(usuario.user_type) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="cell-main">{{ getEmpresaNombre(usuario.company_id) }}</div>
                 </td>
                 <td>
                   <span class="status-badge" [class.active]="usuario.is_active" [class.inactive]="!usuario.is_active">
@@ -182,7 +216,7 @@
 <!-- Modal -->
 @if (modalMode()) {
   <div class="modal-overlay" (click)="closeModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal modal-lg" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2 class="modal-title">
           @switch (modalMode()) {
@@ -205,28 +239,34 @@
               <span class="code-badge large">{{ selectedUsuario()!.code }}</span>
             </div>
             <div class="detail-item">
-              <label>Nombre</label>
-              <span>{{ selectedUsuario()!.name }}</span>
+              <label>Nombre Completo</label>
+              <div class="detail-value-row">
+                <span>{{ selectedUsuario()!.name }}</span>
+                @if (selectedUsuario()!.is_primary) {
+                  <span class="badge badge-primary-user">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    Usuario Principal
+                  </span>
+                }
+              </div>
             </div>
-            <div class="detail-item full-width">
+            <div class="detail-item">
               <label>Email</label>
               <span>{{ selectedUsuario()!.email }}</span>
             </div>
             <div class="detail-item">
-              <label>Rol</label>
-              <span class="role-badge">{{ getRoleLabel(selectedUsuario()!.role_code) }}</span>
+              <label>Teléfono</label>
+              <span>{{ selectedUsuario()!.phone || '-' }}</span>
             </div>
             <div class="detail-item">
-              <label>Código de Rol</label>
-              <span>{{ selectedUsuario()!.role_code || '-' }}</span>
+              <label>Tipo de Usuario</label>
+              <span class="role-badge" [ngClass]="getTipoUsuarioBadgeClass(selectedUsuario()!.user_type)">
+                {{ getTipoUsuarioNombre(selectedUsuario()!.user_type) }}
+              </span>
             </div>
             <div class="detail-item">
               <label>Empresa</label>
-              <span>{{ selectedUsuario()!.company_name || '-' }}</span>
-            </div>
-            <div class="detail-item">
-              <label>Código de Empresa</label>
-              <span>{{ selectedUsuario()!.company_code || '-' }}</span>
+              <span>{{ getEmpresaNombre(selectedUsuario()!.company_id) }}</span>
             </div>
             <div class="detail-item">
               <label>Estado</label>
@@ -237,7 +277,7 @@
             </div>
             <div class="detail-item">
               <label>Fecha de Creación</label>
-              <span>{{ selectedUsuario()!.created_at || '-' }}</span>
+              <span>{{ formatDate(selectedUsuario()!.created_at) }}</span>
             </div>
           </div>
         } @else {
@@ -258,31 +298,30 @@
 
           <form class="form-grid" (ngSubmit)="saveUsuario()">
             <div class="form-group">
-              <label for="code">Código <span class="required">*</span></label>
+              <label for="names">Nombres <span class="required">*</span></label>
               <input 
                 type="text" 
-                id="code" 
-                [(ngModel)]="formData.code" 
-                name="code"
-                placeholder="Ej: USR001"
-                [disabled]="modalMode() === 'edit'"
+                id="names" 
+                [(ngModel)]="formData.names" 
+                name="names"
+                placeholder="Nombres del usuario"
                 class="form-control"
               >
             </div>
 
             <div class="form-group">
-              <label for="name">Nombre <span class="required">*</span></label>
+              <label for="last_names">Apellidos <span class="required">*</span></label>
               <input 
                 type="text" 
-                id="name" 
-                [(ngModel)]="formData.name" 
-                name="name"
-                placeholder="Nombre completo del usuario"
+                id="last_names" 
+                [(ngModel)]="formData.last_names" 
+                name="last_names"
+                placeholder="Apellidos del usuario"
                 class="form-control"
               >
             </div>
 
-            <div class="form-group full-width">
+            <div class="form-group">
               <label for="email">Email <span class="required">*</span></label>
               <input 
                 type="email" 
@@ -295,30 +334,62 @@
             </div>
 
             <div class="form-group">
-              <label for="role_code">Código de Rol</label>
-              <select 
-                id="role_code" 
-                [(ngModel)]="formData.role_code" 
-                name="role_code"
+              <label for="phone">Teléfono</label>
+              <input 
+                type="tel" 
+                id="phone" 
+                [(ngModel)]="formData.phone" 
+                name="phone"
+                placeholder="999 999 999"
                 class="form-control"
               >
-                <option value="">Seleccionar rol</option>
-                <option value="ADMIN">Administrador</option>
-                <option value="USER">Usuario</option>
-                <option value="OPERATOR">Operador</option>
-                <option value="SUPERVISOR">Supervisor</option>
-                <option value="VIEWER">Visualizador</option>
+            </div>
+
+            <div class="form-group">
+              <label for="user_type">Tipo de Usuario</label>
+              <select 
+                id="user_type" 
+                [(ngModel)]="formData.user_type" 
+                name="user_type"
+                class="form-control"
+              >
+                <option [ngValue]="undefined">Seleccionar tipo</option>
+                @for (tipo of tiposUsuario(); track tipo.id) {
+                  <option [ngValue]="tipo.id">{{ tipo.name }}</option>
+                }
               </select>
             </div>
 
             <div class="form-group">
-              <label for="company_code">Código de Empresa</label>
+              <label for="company_id">Empresa</label>
+              <select 
+                id="company_id" 
+                [(ngModel)]="formData.company_id" 
+                name="company_id"
+                class="form-control"
+              >
+                <option [ngValue]="undefined">Sin empresa</option>
+                @for (empresa of empresas(); track empresa.id) {
+                  <option [ngValue]="empresa.id">{{ empresa.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="password">
+                Contraseña 
+                @if (modalMode() === 'create') {
+                  <span class="required">*</span>
+                } @else {
+                  <span class="hint">(dejar vacío para mantener)</span>
+                }
+              </label>
               <input 
-                type="text" 
-                id="company_code" 
-                [(ngModel)]="formData.company_code" 
-                name="company_code"
-                placeholder="Código de la empresa"
+                type="password" 
+                id="password" 
+                [(ngModel)]="formData.password" 
+                name="password"
+                placeholder="Ingrese contraseña"
                 class="form-control"
               >
             </div>
@@ -333,6 +404,19 @@
                 >
                 <span class="toggle-switch"></span>
                 <span class="toggle-text">Usuario activo</span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="toggle-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="formData.is_primary" 
+                  name="is_primary"
+                  class="toggle-input"
+                >
+                <span class="toggle-switch"></span>
+                <span class="toggle-text">Usuario principal de la empresa</span>
               </label>
             </div>
           </form>

@@ -33,6 +33,10 @@ export class DatabaseUtil {
     @Inject('REQUEST_MODEL') private Request: Model<any>,
     @Inject('RESIDUE_MODEL') private Residue: Model<any>,
     @Inject('AUTHORIZED_OPERATION_MODEL') private AuthorizedOperation: Model<any>,
+    @Inject('COMPANY_REQUEST_MODEL') private CompanyRequest: Model<any>,
+    @Inject('AFFILIATION_REQUEST_MODEL') private AffiliationRequest: Model<any>,
+    @Inject('USER_PERMISSION_MODEL') private UserPermission: Model<any>,
+    @Inject('OPERATION_TYPE_MODEL') private OperationType: Model<any>,
     
     private Prisma: PrismaService
   ) {}
@@ -231,6 +235,10 @@ export class DatabaseUtil {
       'requests': this.Request,
       'residues': this.Residue,
       'authorized_operations': this.AuthorizedOperation,
+      'company_requests': this.CompanyRequest,
+      'affiliation_requests': this.AffiliationRequest,
+      'user_permissions': this.UserPermission,
+      'operation_types': this.OperationType,
     };
 
     const model = modelMap[modelName];
@@ -239,5 +247,67 @@ export class DatabaseUtil {
     }
 
     return model;
+  }
+
+  // Método especial para crear usuario desde aprobación de afiliación
+  async createUserFromAffiliation(data: {
+    names: string;
+    last_names: string;
+    email: string;
+    phone?: string;
+    company_id: number;
+    password?: string;
+  }): Promise<any> {
+    try {
+      const userData = [{
+        names: data.names,
+        last_names: data.last_names,
+        email: data.email,
+        phone: data.phone || null,
+        company_id: data.company_id,
+        password: data.password || 'temp1234'
+      }];
+      
+      // Usar parámetros para evitar problemas de escape JSON
+      const jsonData = JSON.stringify(userData);
+      console.log('Creating user with data:', jsonData);
+      
+      const result = await this.Prisma.$queryRawUnsafe(
+        `SELECT * FROM public.fx_create_user_from_affiliation($1::jsonb)`,
+        jsonData
+      );
+      
+      console.log('Create user result:', result);
+      
+      if (result && Array.isArray(result) && result.length > 0) {
+        return {
+          success: true,
+          data: result[0],
+          message: 'Usuario creado exitosamente'
+        };
+      } else {
+        throw new HttpException('No se pudo crear el usuario - resultado vacío', HttpStatus.BAD_REQUEST);
+      }
+    } catch (error) {
+      console.error('Error creating user from affiliation:', error);
+      throw new HttpException(`Error al crear usuario: ${error.message || error}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // Método para establecer usuario principal de empresa
+  async setUserAsPrimary(userId: number, companyId: number): Promise<any> {
+    try {
+      const result = await this.Prisma.$queryRawUnsafe(
+        `SELECT public.fx_set_primary_user(${userId}, ${companyId})`
+      );
+      
+      return {
+        success: true,
+        message: 'Usuario establecido como principal'
+      };
+    } catch (error) {
+      console.error('Error setting primary user:', error);
+      throw new HttpException(`Error: ${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

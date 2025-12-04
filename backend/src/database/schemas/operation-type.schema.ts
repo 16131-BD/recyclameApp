@@ -1,9 +1,8 @@
 import * as mongoose from 'mongoose';
 
-// Operaciones Autorizadas Schema para MongoDB
+// Operation Types Schema para MongoDB
 // Define los tipos de operaciones autorizadas en el sistema de reciclaje
-// (REC, VAL, TRA, DIS, IMP)
-export const AuthorizedOperation = new mongoose.Schema({
+export const OperationType = new mongoose.Schema({
   // Orden de visualización
   order: { type: Number, required: true },
   
@@ -16,6 +15,12 @@ export const AuthorizedOperation = new mongoose.Schema({
   // Descripción detallada
   description: { type: String },
   
+  // Ícono (opcional, para UI)
+  icon: { type: String },
+  
+  // Color para badges (opcional)
+  color: { type: String },
+  
   // Estado activo
   is_active: { type: Boolean, default: true },
   
@@ -25,7 +30,7 @@ export const AuthorizedOperation = new mongoose.Schema({
 });
 
 // Pre-save hook
-AuthorizedOperation.pre('save', function(next) {
+OperationType.pre('save', function(next) {
   this.updated_at = new Date();
   next();
 });

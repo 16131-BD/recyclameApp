@@ -111,6 +111,8 @@ model users {
   created_at DateTime   @default(now()) @db.Timestamptz(6)
   company_id BigInt?
   user_type  BigInt?
+  is_primary Boolean?   @default(false)
+  is_active  Boolean?   @default(true)
   residues   residues[]
   companies  companies? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   types      types?     @relation(fields: [user_type], references: [id], onDelete: NoAction, onUpdate: NoAction)

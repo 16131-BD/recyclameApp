@@ -8,18 +8,18 @@ const functions = {
       'operations_detail/create': 'fx_ins_operations_detail',
       'plants/by': 'fx_sel_plants',
       'plants/create': 'fx_ins_plants',
-      'types/by': 'fx_sel_types',
-      'types/create': 'fx_ins_types',
+      'types/by': 'fx_sel_types_full',
+      'types/create': 'fx_ins_types_full',
       'users/by': 'fx_sel_users',
       'users/create': 'fx_ins_users',
     },
     'PUT': {
-      'companies/update': 'fx_update_companies',
-      'operations_detail/update': 'fx_update_operations_detail',
-      'plants/update': 'fx_update_plants',
-      'residues/update': 'fx_update_residues',
-      'types/update': 'fx_update_types',
-      'users/update': 'fx_update_users',
+      'companies/update': 'fx_upd_companies',
+      'operations_detail/update': 'fx_upd_operations_detail',
+      'plants/update': 'fx_upd_plants',
+      'residues/update': 'fx_upd_residues',
+      'types/update': 'fx_upd_types_full',
+      'users/update': 'fx_upd_users',
     }
     // ... resto de tu configuración
   },
@@ -35,6 +35,14 @@ const functions = {
       'residues/create': 'residues',
       'authorized_operations/by': 'authorized_operations',
       'authorized_operations/create': 'authorized_operations',
+      'company_requests/by': 'company_requests',
+      'company_requests/create': 'company_requests',
+      'affiliation_requests/by': 'affiliation_requests',
+      'affiliation_requests/create': 'affiliation_requests',
+      'user_permissions/by': 'user_permissions',
+      'user_permissions/create': 'user_permissions',
+      'operation_types/by': 'operation_types',
+      'operation_types/create': 'operation_types',
     },
     'PUT': {
       'affiliations/update': 'affiliations',
@@ -42,6 +50,10 @@ const functions = {
       'requests/update': 'requests',
       'residues/update': 'residues',
       'authorized_operations/update': 'authorized_operations',
+      'company_requests/update': 'company_requests',
+      'affiliation_requests/update': 'affiliation_requests',
+      'user_permissions/update': 'user_permissions',
+      'operation_types/update': 'operation_types',
     }
     // ... tu configuración de mongo
   }

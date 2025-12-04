@@ -38,6 +38,8 @@ export class BackofficeComponent implements OnInit {
   // SVG Icons
   private icons = {
     dashboard: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>',
+    companyRequests: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
+    affiliationRequests: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
     companies: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>',
     users: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
     residues: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/><path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/><path d="m14 16-3 3 3 3"/><path d="M8.293 13.596 4.875 7.33a1.783 1.783 0 0 1 .013-1.782A1.83 1.83 0 0 1 6.46 4.64l8.08.004"/><path d="m10 8 3-3-3-3"/></svg>',
@@ -84,6 +86,21 @@ export class BackofficeComponent implements OnInit {
 
     this.menuGestion = [
       {
+        id: 'companyRequests',
+        name: 'Solicitudes de Empresas',
+        uri: '/backoffice/solicitudes-empresas',
+        iconSvg: this.sanitizer.bypassSecurityTrustHtml(this.icons.companyRequests),
+        selected: false,
+        badge: 2
+      },
+      {
+        id: 'affiliationRequests',
+        name: 'Solicitudes de Afiliación',
+        uri: '/backoffice/solicitudes-afiliacion',
+        iconSvg: this.sanitizer.bypassSecurityTrustHtml(this.icons.affiliationRequests),
+        selected: false
+      },
+      {
         id: 'companies',
         name: 'Empresas',
         uri: '/backoffice/empresas',
@@ -97,14 +114,15 @@ export class BackofficeComponent implements OnInit {
         iconSvg: this.sanitizer.bypassSecurityTrustHtml(this.icons.users),
         selected: false
       },
-      {
-        id: 'residues',
-        name: 'Residuos',
-        uri: '/backoffice/residuos',
-        iconSvg: this.sanitizer.bypassSecurityTrustHtml(this.icons.residues),
-        selected: false,
-        badge: 12
-      },
+      // MÓDULO RESIDUOS - DESHABILITADO
+      // {
+      //   id: 'residues',
+      //   name: 'Residuos',
+      //   uri: '/backoffice/residuos',
+      //   iconSvg: this.sanitizer.bypassSecurityTrustHtml(this.icons.residues),
+      //   selected: false,
+      //   badge: 12
+      // },
       {
         id: 'plants',
         name: 'Plantas',
@@ -145,8 +163,69 @@ export class BackofficeComponent implements OnInit {
     if (user) {
       this.userName = `${user.names || ''} ${user.last_names || ''}`.trim() || 'Usuario';
       this.userInitials = this.getInitials(this.userName);
-      // Map user_type to role name
-      this.userRole = 'Administrador';
+      
+      // Determinar rol basado en user_type_abbr o user_type
+      if (user.user_type_abbr) {
+        switch (user.user_type_abbr) {
+          case 'ADM': this.userRole = 'Administrador'; break;
+          case 'PRI': this.userRole = 'Principal'; break;
+          case 'SEC': this.userRole = 'Secundario'; break;
+          default: this.userRole = user.user_type_name || 'Usuario';
+        }
+      } else {
+        // Fallback por ID de tipo
+        switch (user.user_type) {
+          case 9: this.userRole = 'Administrador'; break;
+          case 31: this.userRole = 'Principal'; break;
+          case 32: this.userRole = 'Secundario'; break;
+          default: this.userRole = 'Usuario';
+        }
+      }
+      
+      // Filtrar menú según permisos del usuario
+      this.filterMenuByPermissions(user);
+    }
+  }
+
+  private filterMenuByPermissions(user: any): void {
+    // Administradores y Principales ven todo
+    const isAdmin = user.user_type === 9 || user.user_type_abbr === 'ADM';
+    const isPrimary = user.is_primary || user.user_type === 31 || user.user_type_abbr === 'PRI';
+    
+    if (isAdmin || isPrimary) {
+      return; // Mantener menú completo
+    }
+    
+    // Para usuarios secundarios, filtrar según permisos
+    const permissions = user.permissions?.modules;
+    if (!permissions) {
+      // Sin permisos definidos, mostrar solo dashboard y lo básico
+      this.menuGestion = this.menuGestion.filter(item => 
+        ['residues', 'plants', 'operations'].includes(item.id)
+      );
+      this.menuConfig = [];
+      return;
+    }
+    
+    // Mapeo de IDs de menú a permisos
+    const menuPermissionMap: { [key: string]: keyof typeof permissions } = {
+      'companyRequests': 'company_requests',
+      'affiliationRequests': 'affiliation_requests',
+      'companies': 'companies',
+      'users': 'users',
+      'residues': 'residues',
+      'plants': 'plants',
+      'operations': 'operations'
+    };
+    
+    this.menuGestion = this.menuGestion.filter(item => {
+      const permKey = menuPermissionMap[item.id];
+      return permKey ? permissions[permKey] : true;
+    });
+    
+    // Configuración solo para admins
+    if (!permissions.settings) {
+      this.menuConfig = [];
     }
   }
 

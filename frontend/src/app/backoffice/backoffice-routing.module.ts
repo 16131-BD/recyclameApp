@@ -4,9 +4,11 @@ import { Dashboard } from './dashboard/dashboard';
 import { TableManagement } from './table-management/table-management';
 import { Empresas } from './empresas/empresas';
 import { Usuarios } from './usuarios/usuarios';
-import { Residuos } from './residuos/residuos';
+// import { Residuos } from './residuos/residuos'; // MÓDULO DESHABILITADO
 import { Plantas } from './plantas/plantas';
 import { Operaciones } from './operaciones/operaciones';
+import { SolicitudesEmpresas } from './solicitudes-empresas/solicitudes-empresas';
+import { SolicitudesAfiliacion } from './solicitudes-afiliacion/solicitudes-afiliacion';
 import { NgModule } from '@angular/core';
 
 export const routes: Routes = [
@@ -25,6 +27,16 @@ export const routes: Routes = [
               data: { title: 'Tablero' }
           },
           {
+              path: 'solicitudes-empresas',
+              component: SolicitudesEmpresas,
+              data: { title: 'Solicitudes de Empresas' }
+          },
+          {
+              path: 'solicitudes-afiliacion',
+              component: SolicitudesAfiliacion,
+              data: { title: 'Solicitudes de Afiliación' }
+          },
+          {
               path: 'empresas',
               component: Empresas,
               data: { title: 'Empresas' }
@@ -34,11 +46,12 @@ export const routes: Routes = [
               component: Usuarios,
               data: { title: 'Usuarios' }
           },
-          {
-              path: 'residuos',
-              component: Residuos,
-              data: { title: 'Residuos' }
-          },
+          // MÓDULO RESIDUOS - DESHABILITADO
+          // {
+          //     path: 'residuos',
+          //     component: Residuos,
+          //     data: { title: 'Residuos' }
+          // },
           {
               path: 'plantas',
               component: Plantas,
