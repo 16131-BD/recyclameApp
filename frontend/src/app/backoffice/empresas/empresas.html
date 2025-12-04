@@ -38,7 +38,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <input 
         type="text" 
-        placeholder="Buscar por nombre, código o RUC..." 
+        placeholder="Buscar por nombre, código o contacto..." 
         class="search-input"
         [value]="searchTerm()"
         (input)="updateSearch($event)"
@@ -113,7 +113,6 @@
               <th>Código</th>
               <th>Nombre</th>
               <th>Tipo</th>
-              <th>RUC</th>
               <th>Contacto</th>
               <th>Estado</th>
               <th class="text-center">Acciones</th>
@@ -136,7 +135,6 @@
                     {{ getCompanyTypeLabel(empresa.company_type_abbr) }}
                   </span>
                 </td>
-                <td>{{ empresa.ruc || '-' }}</td>
                 <td>
                   @if (empresa.contact_name) {
                     <div class="cell-main">{{ empresa.contact_name }}</div>
@@ -218,10 +216,6 @@
                 {{ getCompanyTypeLabel(selectedEmpresa()!.company_type_abbr) }}
               </span>
             </div>
-            <div class="detail-item">
-              <label>RUC</label>
-              <span>{{ selectedEmpresa()!.ruc || '-' }}</span>
-            </div>
             <div class="detail-item full-width">
               <label>Dirección</label>
               <span>{{ selectedEmpresa()!.address || '-' }}</span>
@@ -284,18 +278,6 @@
                 [(ngModel)]="formData.name" 
                 name="name"
                 placeholder="Nombre de la empresa"
-                class="form-control"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="ruc">RUC</label>
-              <input 
-                type="text" 
-                id="ruc" 
-                [(ngModel)]="formData.ruc" 
-                name="ruc"
-                placeholder="RUC de la empresa"
                 class="form-control"
               >
             </div>

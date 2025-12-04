@@ -65,7 +65,7 @@ export class Empresas implements OnInit {
       list = list.filter(e => 
         e.name.toLowerCase().includes(search) ||
         e.code.toLowerCase().includes(search) ||
-        (e.ruc && e.ruc.includes(search))
+        (e.contact_name && e.contact_name.toLowerCase().includes(search))
       );
     }
 
@@ -124,7 +124,6 @@ export class Empresas implements OnInit {
     this.formData = {
       code: '',
       name: '',
-      ruc: '',
       address: '',
       phone: '',
       email: '',
